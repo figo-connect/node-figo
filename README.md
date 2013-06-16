@@ -1,4 +1,4 @@
-node-figo
+node-figo [![Build Status](https://secure.travis-ci.org/figo-connect/node-figo.png)](https://travis-ci.org/figo-connect/node-figo)
 =========
 
 Node.js bindings for the figo Connect API: http://developer.figo.me
