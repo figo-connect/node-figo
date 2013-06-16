@@ -92,6 +92,6 @@ var process_redirect = function(authorization_code, state) {
 ```
 
 You can find more documentation at
-[http://htmlpreview.github.io/?https://github.com/figo-connect/node-figo/blob/master/doc/lib/figo.html](https://github.com/figo-connect/node-figo/blob/master/doc/lib/figo.html)
+[https://github.com/figo-connect/node-figo/blob/master/doc/lib/figo.html](http://htmlpreview.github.io/?https://github.com/figo-connect/node-figo/blob/master/doc/lib/figo.html)
 and
-[http://htmlpreview.github.io/?https://github.com/figo-connect/node-figo/blob/master/doc/lib/models.html](https://github.com/figo-connect/node-figo/blob/master/doc/lib/models.html)
+[https://github.com/figo-connect/node-figo/blob/master/doc/lib/models.html](http://htmlpreview.github.io/?https://github.com/figo-connect/node-figo/blob/master/doc/lib/models.html)
