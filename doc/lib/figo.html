@@ -1,0 +1,444 @@
+<!DOCTYPE html><html lang="en"><head><title>lib/figo</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="lib/figo"><meta name="groc-project-path" content="lib/figo.js"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">lib/figo.js</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><p>Copyright (c) 2013 figo GmbH</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.</p></div></div><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">https</span>       <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">&quot;https&quot;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">tls</span>         <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">&quot;tls&quot;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">querystring</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">&quot;querystring&quot;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">models</span>      <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">&quot;./models&quot;</span><span class="p">);</span>
+
+
+<span class="kd">var</span> <span class="nx">api_endpoint</span> <span class="o">=</span> <span class="s2">&quot;api.leanbank.com&quot;</span><span class="p">;</span>
+
+<span class="kd">var</span> <span class="nx">valid_fingerprints</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;A6:FE:08:F4:A8:86:F9:C1:BF:4E:70:0A:BD:72:AE:B8:8E:B7:78:52&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;AD:A0:E3:2B:1F:CE:E8:44:F2:83:BA:AE:E4:7D:F2:AD:44:48:7F:1E&quot;</span><span class="p">];</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="base-object-for-all-errors-transported-via-the-figo-connect-api">Base object for all errors transported via the figo Connect API</h3>
+
+<p>Constructor parameters:</p>
+
+<ul>
+<li><p><strong>error</strong> (<code>String</code>) - the error code</p></li>
+<li><p><strong>error_description</strong> (<code>String</code>) - the error description</p></li>
+</ul></div></div><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nb">Error</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">error_description</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">error</span> <span class="o">=</span> <span class="nx">error</span><span class="p">;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">error_description</span> <span class="o">=</span> <span class="nx">error_description</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="nb">Error</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">toString</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">error_description</span><span class="p">;</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="https-request-object-with-certificate-authentication-and-enhanced-error-handling">HTTPS request object with certificate authentication and enhanced error handling.</h3>
+
+<p>Constructor parameters:</p>
+
+<ul>
+<li><p><strong>agent</strong> (<code>HttpsAgent</code>) - <code>HttpsAgent</code> object</p></li>
+<li><p><strong>path</strong> (<code>String</code>) - the URL path on the server</p></li>
+<li><p><strong>method</strong> (<code>String</code>) - the HTTP method</p></li>
+<li><p><strong>callback</strong> (<code>Function</code>) - callback function with two parameters: <code>error</code> and <code>result</code></p></li>
+</ul></div></div><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">HttpsRequest</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">agent</span><span class="p">,</span> <span class="nx">path</span><span class="p">,</span> <span class="nx">method</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">aborted</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">buffers</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="kd">var</span> <span class="nx">bufsize</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+  <span class="kd">var</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">method</span><span class="o">:</span> <span class="nx">method</span><span class="p">,</span>
+    <span class="nx">hostname</span><span class="o">:</span> <span class="nx">api_endpoint</span><span class="p">,</span>
+    <span class="nx">port</span><span class="o">:</span> <span class="mi">443</span><span class="p">,</span>
+    <span class="nx">path</span><span class="o">:</span> <span class="nx">path</span><span class="p">,</span>
+    <span class="nx">agent</span><span class="o">:</span> <span class="nx">agent</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Setup https.request object.</p></div></div><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">https</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="nx">options</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="nx">response</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">chunk</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Save received chunk of data.</p></div></div><div class="code"><div class="wrapper">      <span class="nx">buffers</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">chunk</span><span class="p">);</span>
+      <span class="nx">bufsize</span> <span class="o">+=</span> <span class="nx">chunk</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+    <span class="p">});</span>
+
+    <span class="nx">response</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;end&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Concatenate all chunks into a single buffer.</p></div></div><div class="code"><div class="wrapper">      <span class="kd">var</span> <span class="nx">pos</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+      <span class="kd">var</span> <span class="nx">buffer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Buffer</span><span class="p">(</span><span class="nx">bufsize</span><span class="p">);</span>
+      <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">buffers</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">buffers</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">copy</span><span class="p">(</span><span class="nx">buffer</span><span class="p">,</span> <span class="nx">pos</span><span class="p">);</span>
+        <span class="nx">pos</span> <span class="o">+=</span> <span class="nx">buffers</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">length</span><span class="p">;</span>
+      <span class="p">}</span>
+      <span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">buffer</span><span class="p">.</span><span class="nx">toString</span><span class="p">();</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Evaluate HTTP response.</p></div></div><div class="code"><div class="wrapper">      <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">&gt;=</span> <span class="mi">200</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">&lt;</span> <span class="mi">300</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="p">{});</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+          <span class="k">try</span> <span class="p">{</span>
+            <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">result</span><span class="p">));</span>
+          <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">callback</span><span class="p">(</span><span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">&quot;json_error&quot;</span><span class="p">,</span> <span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="p">));</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">===</span> <span class="mi">400</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">try</span> <span class="p">{</span>
+          <span class="kd">var</span> <span class="nx">err</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>
+          <span class="nx">callback</span><span class="p">(</span><span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="nx">err</span><span class="p">.</span><span class="nx">error</span><span class="p">,</span> <span class="nx">err</span><span class="p">.</span><span class="nx">error_description</span><span class="p">));</span>
+        <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">callback</span><span class="p">(</span><span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">&quot;json_error&quot;</span><span class="p">,</span> <span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="p">));</span>
+        <span class="p">}</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">===</span> <span class="mi">401</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">&quot;unauthorized&quot;</span><span class="p">,</span> <span class="s2">&quot;Missing, invalid or expired access token.&quot;</span><span class="p">));</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">===</span> <span class="mi">403</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">&quot;forbidden&quot;</span><span class="p">,</span> <span class="s2">&quot;Insufficient permission.&quot;</span><span class="p">));</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">===</span> <span class="mi">404</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="kc">null</span><span class="p">);</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">===</span> <span class="mi">405</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">&quot;method_not_allowed&quot;</span><span class="p">,</span> <span class="s2">&quot;Unexpected request method.&quot;</span><span class="p">));</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">===</span> <span class="mi">503</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">&quot;service_unavailable&quot;</span><span class="p">,</span> <span class="s2">&quot;Exceeded rate limit.&quot;</span><span class="p">));</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">&quot;internal_server_error&quot;</span><span class="p">,</span> <span class="s2">&quot;We are very sorry, but something went wrong.&quot;</span><span class="p">));</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+
+  <span class="p">});</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Setup common HTTP headers.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">request</span><span class="p">.</span><span class="nx">setHeader</span><span class="p">(</span><span class="s2">&quot;Accept&quot;</span><span class="p">,</span> <span class="s2">&quot;application/json&quot;</span><span class="p">);</span>
+  <span class="nx">request</span><span class="p">.</span><span class="nx">setHeader</span><span class="p">(</span><span class="s2">&quot;User-Agent&quot;</span><span class="p">,</span> <span class="s2">&quot;node-figo&quot;</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Setup timeout.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">request</span><span class="p">.</span><span class="nx">setTimeout</span><span class="p">(</span><span class="mi">60</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">);</span>
+
+  <span class="nx">request</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;timeout&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">aborted</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">aborted</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+      <span class="nx">callback</span><span class="p">(</span><span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">&quot;timeout&quot;</span><span class="p">,</span> <span class="s2">&quot;Server connection timed out.&quot;</span><span class="p">));</span>
+      <span class="nx">request</span><span class="p">.</span><span class="nx">abort</span><span class="p">();</span>
+    <span class="p">}</span>
+  <span class="p">});</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Setup error handler.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">request</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;error&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">aborted</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">aborted</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">request</span><span class="p">.</span><span class="nx">figo_ssl_error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">&quot;ssl_error&quot;</span><span class="p">,</span> <span class="s2">&quot;SSL/TLS certificate fingerprint mismatch.&quot;</span><span class="p">));</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">&quot;socket_error&quot;</span><span class="p">,</span> <span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="p">));</span>
+      <span class="p">}</span>
+      <span class="nx">request</span><span class="p">.</span><span class="nx">abort</span><span class="p">();</span>
+    <span class="p">}</span>
+  <span class="p">});</span>
+
+  <span class="k">return</span> <span class="nx">request</span><span class="p">;</span>
+<span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="https-agent-object-with-certificate-authentication">HTTPS agent object with certificate authentication.</h3></div></div></div><div class="segment"><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">HttpsAgent</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">agent</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">https</span><span class="p">.</span><span class="nx">Agent</span><span class="p">({</span> <span class="nx">hostname</span><span class="o">:</span> <span class="nx">api_endpoint</span><span class="p">,</span> <span class="nx">port</span><span class="o">:</span> <span class="mi">443</span> <span class="p">});</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Replace createConnection method with our own certificate authentication method.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">agent</span><span class="p">.</span><span class="nx">createConnection</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">agent</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">stream</span> <span class="o">=</span> <span class="nx">tls</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nx">options</span><span class="p">);</span>
+
+    <span class="nx">stream</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;secureConnect&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+       <span class="kd">var</span> <span class="nx">certificate</span> <span class="o">=</span> <span class="nx">stream</span><span class="p">.</span><span class="nx">getPeerCertificate</span><span class="p">();</span>
+       <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">certificate</span> <span class="o">||</span> <span class="o">!</span><span class="nx">certificate</span><span class="p">.</span><span class="nx">fingerprint</span> <span class="o">||</span> <span class="nx">valid_fingerprints</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">certificate</span><span class="p">.</span><span class="nx">fingerprint</span><span class="p">)</span> <span class="o">===</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+         <span class="nx">agent</span><span class="p">.</span><span class="nx">figo_request</span><span class="p">.</span><span class="nx">figo_ssl_error</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+         <span class="nx">agent</span><span class="p">.</span><span class="nx">figo_request</span><span class="p">.</span><span class="nx">abort</span><span class="p">();</span>
+       <span class="p">}</span>
+    <span class="p">});</span>
+
+    <span class="k">return</span> <span class="nx">stream</span><span class="p">;</span>
+  <span class="p">};</span>
+
+  <span class="k">return</span> <span class="nx">agent</span><span class="p">;</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="represents-a-non-user-bound-connection-to-the-figo-connect-api">Represents a non user-bound connection to the figo Connect API.</h3>
+
+<p>It's main purpose is to let user login via OAuth 2.0.</p>
+
+<p>Constructor parameters:</p>
+
+<ul>
+<li><p><strong>client_id</strong> (<code>String</code>) - the client ID</p></li>
+<li><p><strong>client_secret</strong> (<code>String</code>) - the client secret</p></li>
+<li><p><strong>redirect_uri</strong> (<code>String</code>) - optional redirect URI</p></li>
+</ul></div></div><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">Connection</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">client_id</span><span class="p">,</span> <span class="nx">client_secret</span><span class="p">,</span> <span class="nx">redirect_uri</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>The agent object is required for persistent HTTPS connection and for certificate checking.</p></div></div><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">agent</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">HttpsAgent</span><span class="p">();</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Methods:</p></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p><strong>query_api</strong> - Helper method for making a OAuth 2.0 request.</p>
+
+<ul>
+<li><p><strong>path</strong> (<code>String</code>) - the URL path on the server</p></li>
+<li><p><strong>data</strong> (<code>Object</code>) - If this parameter is defined, then it will be used as JSON-encoded POST content.</p></li>
+<li><p><strong>callback</strong> (<code>Function</code>) - callback function with two parameters: <code>error</code> and <code>result</code></p></li>
+</ul></div></div><div class="code"><div class="wrapper">  <span class="k">this</span><span class="p">.</span><span class="nx">query_api</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">path</span><span class="p">,</span> <span class="nx">data</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">agent</span><span class="p">.</span><span class="nx">figo_request</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">callback</span><span class="p">(</span><span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">&quot;sdk_error&quot;</span><span class="p">,</span> <span class="s2">&quot;Each `Connection` object can only send one API request at the same time.&quot;</span><span class="p">));</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">request</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">HttpsRequest</span><span class="p">(</span><span class="nx">agent</span><span class="p">,</span> <span class="nx">path</span><span class="p">,</span> <span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">agent</span><span class="p">.</span><span class="nx">figo_request</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">);</span>
+      <span class="p">});</span>
+      <span class="nx">agent</span><span class="p">.</span><span class="nx">figo_request</span> <span class="o">=</span> <span class="nx">request</span><span class="p">;</span>
+
+      <span class="nx">request</span><span class="p">.</span><span class="nx">setHeader</span><span class="p">(</span><span class="s2">&quot;Authorization&quot;</span><span class="p">,</span> <span class="s2">&quot;Basic &quot;</span> <span class="o">+</span> <span class="k">new</span> <span class="nx">Buffer</span><span class="p">(</span><span class="nx">client_id</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nx">client_secret</span><span class="p">).</span><span class="nx">toString</span><span class="p">(</span><span class="s2">&quot;base64&quot;</span><span class="p">));</span>
+      <span class="nx">request</span><span class="p">.</span><span class="nx">setHeader</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">,</span> <span class="s2">&quot;application/x-www-form-urlencoded&quot;</span><span class="p">);</span>
+
+      <span class="k">if</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">request</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="nx">querystring</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">data</span><span class="p">));</span>
+      <span class="p">}</span>
+      <span class="nx">request</span><span class="p">.</span><span class="nx">end</span><span class="p">();</span>
+    <span class="p">}</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p><strong>get<em>login</em>url</strong> - Get the URL a user should open in the web browser to start the login process.</p>
+
+<p>When the process is completed, the user is redirected to the URL provided to
+the constructor and passes on an authentication code. This code can be converted
+into an access token for data access.</p>
+
+<ul>
+<li><p><strong>state</strong> (<code>String</code>) - this string will be passed on through the complete login
+  process and to the redirect target at the end. It should be used to
+  validated the authenticity of the call to the redirect URL.</p></li>
+<li><p><strong>scope</strong> (<code>String</code>) optional scope of data access to ask the user for, e.g. <code>accounts=ro</code>.</p></li>
+</ul>
+
+<p>Returns: the URL to be opened by the user</p></div></div><div class="code"><div class="wrapper">  <span class="k">this</span><span class="p">.</span><span class="nx">login_url</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">state</span><span class="p">,</span> <span class="nx">scope</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">response_type</span><span class="o">:</span> <span class="s2">&quot;code&quot;</span><span class="p">,</span> <span class="nx">client_id</span><span class="o">:</span> <span class="nx">client_id</span><span class="p">,</span> <span class="nx">state</span><span class="o">:</span> <span class="nx">state</span> <span class="p">};</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">scope</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">options</span><span class="p">.</span><span class="nx">scope</span> <span class="o">=</span> <span class="nx">scope</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">redirect_uri</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">options</span><span class="p">.</span><span class="nx">redirect_uri</span> <span class="o">=</span> <span class="nx">redirect_uri</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="s2">&quot;https://&quot;</span> <span class="o">+</span> <span class="nx">api_endpoint</span> <span class="o">+</span> <span class="s2">&quot;/auth/code?&quot;</span> <span class="o">+</span> <span class="nx">querystring</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">options</span><span class="p">);</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p><strong>obtain<em>access</em>token</strong> - Exchange authorization code or refresh token for access token.</p>
+
+<ul>
+<li><p><strong>authorization<em>code</em>or<em>refresh</em>token</strong> (<code>String</code>) - either the authorization
+  code received as part of the call to the redirect URL at the end of the
+  logon process, or a refresh token</p></li>
+<li><p><strong>scope</strong> (<code>String</code>) optional scope of data access to ask the user for, e.g. <code>accounts=ro</code></p></li>
+<li><p><strong>callback</strong> (<code>Function</code>) - callback function with two parameters: <code>error</code> and <code>result</code>;
+  The result parameter is an object with the keys <code>access_token</code>, <code>refresh_token</code> and
+  <code>expires,</code> as documented in the figo Connect API specification.</p></li>
+</ul></div></div><div class="code"><div class="wrapper">  <span class="k">this</span><span class="p">.</span><span class="nx">obtain_access_token</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">authorization_code_or_refresh_token</span><span class="p">,</span> <span class="nx">scope</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Authorization codes always start with "O" and refresh tokens always start with "R".</p></div></div><div class="code"><div class="wrapper">    <span class="kd">var</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{};</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">authorization_code_or_refresh_token</span><span class="p">.</span><span class="nx">charAt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">===</span> <span class="s2">&quot;O&quot;</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">options</span><span class="p">.</span><span class="nx">grant_type</span> <span class="o">=</span> <span class="s2">&quot;authorization_code&quot;</span><span class="p">;</span>
+      <span class="nx">options</span><span class="p">.</span><span class="nx">code</span> <span class="o">=</span> <span class="nx">authorization_code_or_refresh_token</span><span class="p">;</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">redirect_uri</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">options</span><span class="p">.</span><span class="nx">redirect_uri</span> <span class="o">=</span> <span class="nx">redirect_uri</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">authorization_code_or_refresh_token</span><span class="p">.</span><span class="nx">charAt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">===</span> <span class="s2">&quot;R&quot;</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">options</span><span class="p">.</span><span class="nx">grant_type</span> <span class="o">=</span> <span class="s2">&quot;refresh_token&quot;</span><span class="p">;</span>
+      <span class="nx">options</span><span class="p">.</span><span class="nx">refresh_token</span> <span class="o">=</span> <span class="nx">authorization_code_or_refresh_token</span><span class="p">;</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">scope</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">options</span><span class="p">.</span><span class="nx">scope</span> <span class="o">=</span> <span class="nx">scope</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">query_api</span><span class="p">(</span><span class="s2">&quot;/auth/token&quot;</span><span class="p">,</span> <span class="nx">options</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p><strong>revoke_token</strong> - Revoke refresh token or access token.</p>
+
+<p>Note: This action has immediate effect, i.e. you will not be able use that token anymore after this call.</p>
+
+<ul>
+<li><p><strong>refresh<em>token</em>or<em>access</em>token</strong> (<code>String</code>) access or refresh token to be revoked</p></li>
+<li><p><strong>callback</strong> (<code>Function</code>) - callback function with one parameter: <code>error</code></p></li>
+</ul></div></div><div class="code"><div class="wrapper">  <span class="k">this</span><span class="p">.</span><span class="nx">revoke_token</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">refresh_token_or_access_token</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">token</span><span class="o">:</span> <span class="nx">refresh_token_or_access_token</span> <span class="p">};</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">query_api</span><span class="p">(</span><span class="s2">&quot;/auth/revoke?&quot;</span> <span class="o">+</span> <span class="nx">querystring</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">options</span><span class="p">),</span> <span class="nx">callback</span><span class="p">);</span>
+  <span class="p">};</span>
+
+<span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="represents-a-user-bound-connection-to-the-figo-connect-api-and-allows-access-to-the-users-data">Represents a user-bound connection to the figo Connect API and allows access to the user's data.</h3>
+
+<p>Constructor parameters:</p>
+
+<ul>
+<li><strong>access_token</strong> (<code>String</code>) - the access token</li>
+</ul></div></div><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">Session</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">access_token</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>The agent object is required for persistent HTTPS connection and for certificate checking.</p></div></div><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">agent</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">HttpsAgent</span><span class="p">();</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Methods:</p></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p><strong>query_api</strong> - Helper method for making a REST request.</p>
+
+<ul>
+<li><p><strong>path</strong> (<code>String</code>) - the URL path on the server</p></li>
+<li><p><strong>data</strong> (<code>Object</code>) - If this parameter is defined, then it will be used as JSON-encoded POST content.</p></li>
+<li><p><strong>method</strong> (<code>String</code>) - the HTTP method</p></li>
+<li><p><strong>callback</strong> (<code>Function</code>) - callback function with two parameters: <code>error</code> and <code>result</code></p></li>
+</ul></div></div><div class="code"><div class="wrapper">  <span class="k">this</span><span class="p">.</span><span class="nx">query_api</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">path</span><span class="p">,</span> <span class="nx">data</span><span class="p">,</span> <span class="nx">method</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">agent</span><span class="p">.</span><span class="nx">figo_request</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">callback</span><span class="p">(</span><span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">&quot;sdk_error&quot;</span><span class="p">,</span> <span class="s2">&quot;Each `Session` object can only send one API request at the same time.&quot;</span><span class="p">));</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">request</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">HttpsRequest</span><span class="p">(</span><span class="nx">agent</span><span class="p">,</span> <span class="nx">path</span><span class="p">,</span> <span class="nx">method</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">agent</span><span class="p">.</span><span class="nx">figo_request</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">);</span>
+      <span class="p">});</span>
+      <span class="nx">agent</span><span class="p">.</span><span class="nx">figo_request</span> <span class="o">=</span> <span class="nx">request</span><span class="p">;</span>
+
+      <span class="nx">request</span><span class="p">.</span><span class="nx">setHeader</span><span class="p">(</span><span class="s2">&quot;Authorization&quot;</span><span class="p">,</span> <span class="s2">&quot;Bearer &quot;</span> <span class="o">+</span> <span class="nx">access_token</span><span class="p">);</span>
+      <span class="nx">request</span><span class="p">.</span><span class="nx">setHeader</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">,</span> <span class="s2">&quot;application/json&quot;</span><span class="p">);</span>
+
+      <span class="k">if</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">request</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">data</span><span class="p">));</span>
+      <span class="p">}</span>
+      <span class="nx">request</span><span class="p">.</span><span class="nx">end</span><span class="p">();</span>
+    <span class="p">}</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p><strong>get_accounts</strong> - Request list of accounts.</p>
+
+<ul>
+<li><strong>callback</strong> (<code>Function</code>) - callback function with two parameters: <code>error</code> and <code>result</code>;
+  The result parameter is an array of <code>Account</code> objects, one for each account the user has granted the app access.</li>
+</ul></div></div><div class="code"><div class="wrapper">  <span class="k">this</span><span class="p">.</span><span class="nx">get_accounts</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">session</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">query_api</span><span class="p">(</span><span class="s2">&quot;/rest/accounts&quot;</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">accounts</span> <span class="o">=</span> <span class="nx">result</span><span class="p">[</span><span class="s2">&quot;accounts&quot;</span><span class="p">].</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">account</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">return</span> <span class="k">new</span> <span class="nx">models</span><span class="p">.</span><span class="nx">Account</span><span class="p">(</span><span class="nx">session</span><span class="p">,</span> <span class="nx">account</span><span class="p">);</span>
+        <span class="p">});</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">accounts</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p><strong>get_account</strong> - Request specific account.</p>
+
+<ul>
+<li><p><strong>account_id</strong> (<code>String</code>) - ID of the account to be retrieved</p></li>
+<li><p><strong>callback</strong> (<code>Function</code>) - callback function with two parameters: <code>error</code> and <code>result</code>;
+  The result parameter is an <code>Account</code> object.</p></li>
+</ul></div></div><div class="code"><div class="wrapper">  <span class="k">this</span><span class="p">.</span><span class="nx">get_account</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">account_id</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">session</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">query_api</span><span class="p">(</span><span class="s2">&quot;/rest/accounts/&quot;</span> <span class="o">+</span> <span class="nx">account_id</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="kc">null</span><span class="p">);</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="k">new</span> <span class="nx">models</span><span class="p">.</span><span class="nx">Account</span><span class="p">(</span><span class="nx">session</span><span class="p">,</span> <span class="nx">result</span><span class="p">));</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p><strong>get_transactions</strong> - Request list of transactions.</p>
+
+<ul>
+<li><p><strong>options</strong> (<code>Object</code>) - further options</p>
+
+<ul><li><p><strong>since</strong> (<code>String</code>, <code>Date</code>) - This field can either be a transaction ID or a date.</p></li>
+<li><p><strong>start_id</strong> (<code>String</code>) - Do only return transactions which were booked after the start transaction ID.</p></li>
+<li><p><strong>count</strong> (<code>Number</code>) - Limit the number of returned transactions.</p></li>
+<li><p><strong>include_pending</strong> (<code>Boolean</code>) - This flag indicates whether pending transactions should be included
+ in the response; pending transactions are always included as a complete set, regardless of
+ the field <code>since</code>.</p></li></ul></li>
+<li><p><strong>callback</strong> (<code>Function</code>) - callback function with two parameters: <code>error</code> and <code>result</code>;
+  The result parameter is an array of <code>Transaction</code> objects, one for each transaction of the user.</p></li>
+</ul></div></div><div class="code"><div class="wrapper">  <span class="k">this</span><span class="p">.</span><span class="nx">get_transactions</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">options</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">session</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">options</span> <span class="o">=</span> <span class="p">{};</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">options</span><span class="p">.</span><span class="nx">since</span> <span class="o">===</span> <span class="s2">&quot;object&quot;</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">options</span><span class="p">.</span><span class="nx">since</span> <span class="o">=</span> <span class="nx">options</span><span class="p">.</span><span class="nx">since</span><span class="p">.</span><span class="nx">toISOString</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">options</span><span class="p">.</span><span class="nx">count</span> <span class="o">===</span> <span class="s2">&quot;undefined&quot;</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">options</span><span class="p">.</span><span class="nx">count</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">options</span><span class="p">.</span><span class="nx">include_pending</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">include_pending</span> <span class="o">?</span> <span class="mi">1</span> <span class="o">:</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">query_api</span><span class="p">(</span><span class="s2">&quot;/rest/transactions?&quot;</span> <span class="o">+</span> <span class="nx">querystring</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">options</span><span class="p">),</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">transactions</span> <span class="o">=</span> <span class="nx">result</span><span class="p">[</span><span class="s2">&quot;transactions&quot;</span><span class="p">].</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">transaction</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">return</span> <span class="k">new</span> <span class="nx">models</span><span class="p">.</span><span class="nx">Transaction</span><span class="p">(</span><span class="nx">session</span><span class="p">,</span> <span class="nx">transaction</span><span class="p">);</span>
+        <span class="p">});</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">transactions</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p><strong>get<em>sync</em>url</strong> - Request the URL a user should open in the web browser to start the synchronization process.</p>
+
+<ul>
+<li><p><strong>redirect_uri</strong> (<code>String</code>) - The user will be redirected to this URL after the sync process completes.</p></li>
+<li><p><strong>state</strong> (<code>String</code>) - This string will be passed on through the complete synchronization process
+  and to the redirect target at the end. It should be used to validated the authenticity of
+  the call to the redirect URL.</p></li>
+<li><p><strong>options</strong> (<code>Object</code>) - further options</p>
+
+<ul><li><p><strong>disable_notifications</strong> (<code>Booleon</code>) - This flag indicates whether notifications should be sent.</p></li>
+<li><p><strong>if<em>not</em>synced_since</strong> (<code>Number</code>) - If this parameter is set, only those accounts will be
+synchronized, which have not been synchronized within the specified number of minutes.</p></li></ul></li>
+<li><p><strong>callback</strong> (<code>Function</code>) - callback function with two parameters: <code>error</code> and <code>result</code>;
+  The result parameter is the URL to be opened by the user.</p></li>
+</ul></div></div><div class="code"><div class="wrapper">  <span class="k">this</span><span class="p">.</span><span class="nx">get_sync_url</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">redirect_uri</span><span class="p">,</span> <span class="nx">state</span><span class="p">,</span> <span class="nx">options</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">options</span> <span class="o">=</span> <span class="p">{};</span>
+    <span class="p">}</span>
+    <span class="nx">options</span><span class="p">.</span><span class="nx">redirect_uri</span> <span class="o">=</span> <span class="nx">redirect_uri</span><span class="p">;</span>
+    <span class="nx">options</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="nx">state</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">query_api</span><span class="p">(</span><span class="s2">&quot;/rest/sync&quot;</span><span class="p">,</span> <span class="nx">options</span><span class="p">,</span> <span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;https://&quot;</span> <span class="o">+</span> <span class="nx">api_endpoint</span> <span class="o">+</span> <span class="s2">&quot;/task/start?id=&quot;</span> <span class="o">+</span> <span class="nx">result</span><span class="p">.</span><span class="nx">task_token</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p><strong>get_notifications</strong> - Request list of registered notifications.</p>
+
+<ul>
+<li><strong>callback</strong> (<code>Function</code>) - callback function with two parameters: <code>error</code> and <code>result</code>;
+  The result parameter is an array of <code>Notification</code> objects, one for each registered notification.</li>
+</ul></div></div><div class="code"><div class="wrapper">  <span class="k">this</span><span class="p">.</span><span class="nx">get_notifications</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">session</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">query_api</span><span class="p">(</span><span class="s2">&quot;/rest/notifications&quot;</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">notifications</span> <span class="o">=</span> <span class="nx">result</span><span class="p">[</span><span class="s2">&quot;notifications&quot;</span><span class="p">].</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">notification</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">return</span> <span class="k">new</span> <span class="nx">models</span><span class="p">.</span><span class="nx">Notification</span><span class="p">(</span><span class="nx">session</span><span class="p">,</span> <span class="nx">notification</span><span class="p">);</span>
+        <span class="p">});</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">notifications</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p><strong>get_notification</strong> - Request specific notification.</p>
+
+<ul>
+<li><p><strong>notification_id</strong> (<code>String</code>) - ID of the notification to be retrieved</p></li>
+<li><p><strong>callback</strong> (<code>Function</code>) - callback function with two parameters: <code>error</code> and <code>result</code>;
+  The result parameter is a <code>Notification</code> object for the respective notification.</p></li>
+</ul></div></div><div class="code"><div class="wrapper">  <span class="k">this</span><span class="p">.</span><span class="nx">get_notification</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">notification_id</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">session</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">query_api</span><span class="p">(</span><span class="s2">&quot;/rest/notifications/&quot;</span> <span class="o">+</span> <span class="nx">notification_id</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="kc">null</span><span class="p">);</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="k">new</span> <span class="nx">models</span><span class="p">.</span><span class="nx">Notification</span><span class="p">(</span><span class="nx">session</span><span class="p">,</span> <span class="nx">result</span><span class="p">));</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p><strong>add_notification</strong> - Register notification.</p>
+
+<ul>
+<li><p><strong>observe_key</strong> (<code>String</code>) - one of the notification keys specified in the figo Connect API specification</p></li>
+<li><p><strong>notify_url</strong> (<code>String</code>) - Notification messages will be sent to this URL.</p></li>
+<li><p><strong>state</strong> (<code>String</code>) - any kind of string that will be forwarded in the notification message</p></li>
+<li><p><strong>callback</strong> (<code>Function</code>) - callback function with two parameters: <code>error</code> and <code>result</code>;
+  The result parameter is the newly created <code>Notification</code> object.</p></li>
+</ul></div></div><div class="code"><div class="wrapper">  <span class="k">this</span><span class="p">.</span><span class="nx">add_notification</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">observe_key</span><span class="p">,</span> <span class="nx">notify_uri</span><span class="p">,</span> <span class="nx">state</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">session</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">observe_key</span><span class="o">:</span> <span class="nx">observe_key</span><span class="p">,</span> <span class="nx">notify_uri</span><span class="o">:</span> <span class="nx">notify_uri</span><span class="p">,</span> <span class="nx">state</span><span class="o">:</span> <span class="nx">state</span> <span class="p">};</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">query_api</span><span class="p">(</span><span class="s2">&quot;/rest/notifications&quot;</span><span class="p">,</span> <span class="nx">options</span><span class="p">,</span> <span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="k">new</span> <span class="nx">models</span><span class="p">.</span><span class="nx">Notification</span><span class="p">(</span><span class="nx">session</span><span class="p">,</span> <span class="nx">result</span><span class="p">));</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p><strong>modify_notification</strong> - Modify notification.</p>
+
+<ul>
+<li><p><strong>notification</strong> (<code>Notification</code>) - modified notification object</p></li>
+<li><p><strong>callback</strong> (<code>Function</code>) - callback function with one parameter: <code>error</code></p></li>
+</ul></div></div><div class="code"><div class="wrapper">  <span class="k">this</span><span class="p">.</span><span class="nx">modify_notification</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">notification</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">observe_key</span><span class="o">:</span> <span class="nx">notification</span><span class="p">.</span><span class="nx">observe_key</span><span class="p">,</span> <span class="nx">notify_uri</span><span class="o">:</span> <span class="nx">notification</span><span class="p">.</span><span class="nx">notify_uri</span><span class="p">,</span> <span class="nx">state</span><span class="o">:</span> <span class="nx">notification</span><span class="p">.</span><span class="nx">state</span> <span class="p">};</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">query_api</span><span class="p">(</span><span class="s2">&quot;/rest/notifications/&quot;</span> <span class="o">+</span> <span class="nx">notification</span><span class="p">.</span><span class="nx">notification_id</span><span class="p">,</span> <span class="nx">options</span><span class="p">,</span> <span class="s2">&quot;PUT&quot;</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p><strong>remove_notification</strong> - Unregister notification.</p>
+
+<ul>
+<li><p><strong>notification</strong> (<code>Notification</code>) - notification object which should be deleted</p></li>
+<li><p><strong>callback</strong> (<code>Function</code>) - callback function with one parameter: <code>error</code></p></li>
+</ul></div></div><div class="code"><div class="wrapper">  <span class="k">this</span><span class="p">.</span><span class="nx">remove_notification</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">notification</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">query_api</span><span class="p">(</span><span class="s2">&quot;/rest/notifications/&quot;</span> <span class="o">+</span> <span class="nx">notification</span><span class="p">.</span><span class="nx">notification_id</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;DELETE&quot;</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+  <span class="p">};</span>
+
+<span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Exported symbols.</p></div></div><div class="code"><div class="wrapper"><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">AccountType</span><span class="o">:</span>           <span class="nx">models</span><span class="p">.</span><span class="nx">AccountType</span><span class="p">,</span>
+  <span class="nx">TransactionType</span><span class="o">:</span>       <span class="nx">models</span><span class="p">.</span><span class="nx">TransactionType</span><span class="p">,</span>
+  <span class="nx">Account</span><span class="o">:</span>               <span class="nx">models</span><span class="p">.</span><span class="nx">Account</span><span class="p">,</span>
+  <span class="nx">AccountBalance</span><span class="o">:</span>        <span class="nx">models</span><span class="p">.</span><span class="nx">AccountBalance</span><span class="p">,</span>
+  <span class="nx">Transaction</span><span class="o">:</span>           <span class="nx">models</span><span class="p">.</span><span class="nx">Transaction</span><span class="p">,</span>
+  <span class="nx">SynchronizationStatus</span><span class="o">:</span> <span class="nx">models</span><span class="p">.</span><span class="nx">SynchronizationStatus</span><span class="p">,</span>
+  <span class="nx">Notification</span><span class="o">:</span>          <span class="nx">models</span><span class="p">.</span><span class="nx">Notification</span><span class="p">,</span>
+  <span class="nx">Connection</span><span class="o">:</span>            <span class="nx">Connection</span><span class="p">,</span>
+  <span class="nx">Session</span><span class="o">:</span>               <span class="nx">Session</span>
+<span class="p">};</span></div></div></div></div></body></html>

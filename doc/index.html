@@ -1,21 +1,17 @@
-node-figo
-=========
+<!DOCTYPE html><html lang="en"><head><title>index</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="index"><meta name="groc-project-path" content="README.md"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">README.md</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="node-figo">node-figo</h1>
 
-Node.js bindings for the figo Connect API: http://developer.figo.me
+<p>Node.js bindings for the figo Connect API: http://developer.figo.me</p>
 
-Usage
-=====
+<h1 id="usage">Usage</h1>
 
-First, you've to install the package
+<p>First, you've to install the package</p>
 
-```bash
-npm install -g figo
-```
+<pre><code class="bash">npm install -g figo
+</code></pre>
 
-Now you can create a new session and access data:
+<p>Now you can create a new session and access data:</p>
 
-```javascript
-var figo = require("figo");
+<pre><code class="javascript">var figo = require("figo");
 var async = require("async");
 
 var session = new figo.Session("ASHWLIkouP2O6_bgA2wWReRhletgWKHYjLqDaqb0LFfamim9RjexTo22ujRIP_cjLiRiSyQXyt2kM1eXU2XLFZQ0Hro15HikJQT_eNeT_9XQ")
@@ -26,7 +22,7 @@ session.get_accounts(function(error, accounts) {
     async.mapSeries(accounts, function(account, callback) {
       account.get_balance(callback);
     }, function(error, balances) {
-      for (var i = 0; i < accounts.length; i++) {
+      for (var i = 0; i &lt; accounts.length; i++) {
         console.log(accounts[i].account_number);
         console.log(balances[i].balance);
       }
@@ -36,7 +32,7 @@ session.get_accounts(function(error, accounts) {
         if (!error) {
           account.get_transactions(null, function(error, transactions) {
             if (!error) {
-              for (var i = 0; i < transactions.length; i++) {
+              for (var i = 0; i &lt; transactions.length; i++) {
                 console.log(transactions[i].name);
               }
             }
@@ -47,15 +43,14 @@ session.get_accounts(function(error, accounts) {
     });
   }
 });
-```
+</code></pre>
 
-It is just as simple to allow users to login through the API:
+<p>It is just as simple to allow users to login through the API:</p>
 
-```javascript
-var figo = require("figo");
+<pre><code class="javascript">var figo = require("figo");
 var open = require("open");
 
-var connection = new figo.Connection("<client ID>", "<client secret>", "http://my-domain.org/redirect-url");
+var connection = new figo.Connection("&lt;client ID&gt;", "&lt;client secret&gt;", "http://my-domain.org/redirect-url");
 
 var start_login = function() {
   // Open webbrowser to kick of the login process.
@@ -80,7 +75,7 @@ var process_redirect = function(authorization_code, state) {
       // Print out list of account numbers.
       session.get_accounts(function(error, accounts) {
         if (!error) {
-          for (var i = 0; i < accounts.length; i++) {
+          for (var i = 0; i &lt; accounts.length; i++) {
             console.log(accounts[i].account_number);
           }
         }
@@ -89,4 +84,4 @@ var process_redirect = function(authorization_code, state) {
     }
   });
 };
-```
+</code></pre></div></div></div></div></body></html>
