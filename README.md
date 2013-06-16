@@ -6,7 +6,7 @@ Node.js bindings for the figo Connect API: http://developer.figo.me
 Usage
 =====
 
-First, you've to install the package
+First, you've to install the package:
 
 ```bash
 npm install -g figo
@@ -90,3 +90,6 @@ var process_redirect = function(authorization_code, state) {
   });
 };
 ```
+
+You can find more documentation at http://htmlpreview.github.io/?https://github.com/figo-connect/node-figo/blob/master/doc/lib/figo.html and
+http://htmlpreview.github.io/?https://github.com/figo-connect/node-figo/blob/master/doc/lib/models.html
