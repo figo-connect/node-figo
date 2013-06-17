@@ -1,10 +1,10 @@
-<!DOCTYPE html><html lang="en"><head><title>index</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="index"><meta name="groc-project-path" content="README.md"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">README.md</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="node-figo">node-figo</h1>
+<!DOCTYPE html><html lang="en"><head><title>index</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="index"><meta name="groc-project-path" content="README.md"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">README.md</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="nodefigobuildstatushttpssecuretravisciorgfigoconnectnodefigopnghttpstravisciorgfigoconnectnodefigo">node-figo <a href="https://travis-ci.org/figo-connect/node-figo"><img src="https://secure.travis-ci.org/figo-connect/node-figo.png" alt="Build Status" title="" /></a></h1>
 
 <p>Node.js bindings for the figo Connect API: http://developer.figo.me</p>
 
 <h1 id="usage">Usage</h1>
 
-<p>First, you've to install the package</p>
+<p>First, you've to install the package:</p>
 
 <pre><code class="bash">npm install -g figo
 </code></pre>
@@ -14,7 +14,7 @@
 <pre><code class="javascript">var figo = require("figo");
 var async = require("async");
 
-var session = new figo.Session("ASHWLIkouP2O6_bgA2wWReRhletgWKHYjLqDaqb0LFfamim9RjexTo22ujRIP_cjLiRiSyQXyt2kM1eXU2XLFZQ0Hro15HikJQT_eNeT_9XQ")
+var session = new figo.Session("ASHWLIkouP2O6_bgA2wWReRhletgWKHYjLqDaqb0LFfamim9RjexTo22ujRIP_cjLiRiSyQXyt2kM1eXU2XLFZQ0Hro15HikJQT_eNeT_9XQ");
 
 // Print out list of account numbers and balances.
 session.get_accounts(function(error, accounts) {
@@ -84,4 +84,9 @@ var process_redirect = function(authorization_code, state) {
     }
   });
 };
-</code></pre></div></div></div></div></body></html>
+</code></pre>
+
+<p>You can find more documentation at
+<a href="http://htmlpreview.github.io/?https://github.com/figo-connect/node-figo/blob/master/doc/lib/figo.html">https://github.com/figo-connect/node-figo/blob/master/doc/lib/figo.html</a>
+and
+<a href="http://htmlpreview.github.io/?https://github.com/figo-connect/node-figo/blob/master/doc/lib/models.html">https://github.com/figo-connect/node-figo/blob/master/doc/lib/models.html</a></p></div></div></div></div></body></html>

@@ -19,13 +19,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.</p></div></div><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">https</span>       <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">&quot;https&quot;</span><span class="p">);</span>
 <span class="kd">var</span> <span class="nx">tls</span>         <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">&quot;tls&quot;</span><span class="p">);</span>
 <span class="kd">var</span> <span class="nx">querystring</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">&quot;querystring&quot;</span><span class="p">);</span>
-<span class="kd">var</span> <span class="nx">models</span>      <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">&quot;./models&quot;</span><span class="p">);</span>
-
-
-<span class="kd">var</span> <span class="nx">api_endpoint</span> <span class="o">=</span> <span class="s2">&quot;api.leanbank.com&quot;</span><span class="p">;</span>
-
-<span class="kd">var</span> <span class="nx">valid_fingerprints</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;A6:FE:08:F4:A8:86:F9:C1:BF:4E:70:0A:BD:72:AE:B8:8E:B7:78:52&quot;</span><span class="p">,</span>
-                          <span class="s2">&quot;AD:A0:E3:2B:1F:CE:E8:44:F2:83:BA:AE:E4:7D:F2:AD:44:48:7F:1E&quot;</span><span class="p">];</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="base-object-for-all-errors-transported-via-the-figo-connect-api">Base object for all errors transported via the figo Connect API</h3>
+<span class="kd">var</span> <span class="nx">models</span>      <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">&quot;./models&quot;</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="global-configuration">Global configuration.</h3></div></div></div><div class="segment"><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">Config</span> <span class="o">=</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>figo Connect server hostname.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">api_endpoint</span><span class="o">:</span>  <span class="s2">&quot;api.leanbank.com&quot;</span><span class="p">,</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>figo Connect SSL/TLS certificate fingerprints.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">valid_fingerprints</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;A6:FE:08:F4:A8:86:F9:C1:BF:4E:70:0A:BD:72:AE:B8:8E:B7:78:52&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;AD:A0:E3:2B:1F:CE:E8:44:F2:83:BA:AE:E4:7D:F2:AD:44:48:7F:1E&quot;</span> <span class="p">]</span>
+<span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="base-object-for-all-errors-transported-via-the-figo-connect-api">Base object for all errors transported via the figo Connect API</h3>
 
 <p>Constructor parameters:</p>
 
@@ -55,7 +51,7 @@ THE SOFTWARE.</p></div></div><div class="code"><div class="wrapper"><span class=
 
   <span class="kd">var</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
     <span class="nx">method</span><span class="o">:</span> <span class="nx">method</span><span class="p">,</span>
-    <span class="nx">hostname</span><span class="o">:</span> <span class="nx">api_endpoint</span><span class="p">,</span>
+    <span class="nx">hostname</span><span class="o">:</span> <span class="nx">Config</span><span class="p">.</span><span class="nx">api_endpoint</span><span class="p">,</span>
     <span class="nx">port</span><span class="o">:</span> <span class="mi">443</span><span class="p">,</span>
     <span class="nx">path</span><span class="o">:</span> <span class="nx">path</span><span class="p">,</span>
     <span class="nx">agent</span><span class="o">:</span> <span class="nx">agent</span>
@@ -126,13 +122,13 @@ THE SOFTWARE.</p></div></div><div class="code"><div class="wrapper"><span class=
 
   <span class="k">return</span> <span class="nx">request</span><span class="p">;</span>
 <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="https-agent-object-with-certificate-authentication">HTTPS agent object with certificate authentication.</h3></div></div></div><div class="segment"><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">HttpsAgent</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">agent</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">https</span><span class="p">.</span><span class="nx">Agent</span><span class="p">({</span> <span class="nx">hostname</span><span class="o">:</span> <span class="nx">api_endpoint</span><span class="p">,</span> <span class="nx">port</span><span class="o">:</span> <span class="mi">443</span> <span class="p">});</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Replace createConnection method with our own certificate authentication method.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">agent</span><span class="p">.</span><span class="nx">createConnection</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">agent</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">https</span><span class="p">.</span><span class="nx">Agent</span><span class="p">({</span> <span class="nx">hostname</span><span class="o">:</span> <span class="nx">Config</span><span class="p">.</span><span class="nx">api_endpoint</span><span class="p">,</span> <span class="nx">port</span><span class="o">:</span> <span class="mi">443</span> <span class="p">});</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Replace createConnection method with our own certificate authentication method.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">agent</span><span class="p">.</span><span class="nx">createConnection</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">agent</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
     <span class="kd">var</span> <span class="nx">stream</span> <span class="o">=</span> <span class="nx">tls</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nx">options</span><span class="p">);</span>
 
     <span class="nx">stream</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;secureConnect&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
        <span class="kd">var</span> <span class="nx">certificate</span> <span class="o">=</span> <span class="nx">stream</span><span class="p">.</span><span class="nx">getPeerCertificate</span><span class="p">();</span>
-       <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">certificate</span> <span class="o">||</span> <span class="o">!</span><span class="nx">certificate</span><span class="p">.</span><span class="nx">fingerprint</span> <span class="o">||</span> <span class="nx">valid_fingerprints</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">certificate</span><span class="p">.</span><span class="nx">fingerprint</span><span class="p">)</span> <span class="o">===</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+       <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">certificate</span> <span class="o">||</span> <span class="o">!</span><span class="nx">certificate</span><span class="p">.</span><span class="nx">fingerprint</span> <span class="o">||</span> <span class="nx">Config</span><span class="p">.</span><span class="nx">valid_fingerprints</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">certificate</span><span class="p">.</span><span class="nx">fingerprint</span><span class="p">)</span> <span class="o">===</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
          <span class="nx">agent</span><span class="p">.</span><span class="nx">figo_request</span><span class="p">.</span><span class="nx">figo_ssl_error</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
          <span class="nx">agent</span><span class="p">.</span><span class="nx">figo_request</span><span class="p">.</span><span class="nx">abort</span><span class="p">();</span>
        <span class="p">}</span>
@@ -168,11 +164,16 @@ THE SOFTWARE.</p></div></div><div class="code"><div class="wrapper"><span class=
       <span class="p">});</span>
       <span class="nx">agent</span><span class="p">.</span><span class="nx">figo_request</span> <span class="o">=</span> <span class="nx">request</span><span class="p">;</span>
 
+      <span class="k">if</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">data</span> <span class="o">=</span> <span class="nx">querystring</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+      <span class="p">}</span>
+
       <span class="nx">request</span><span class="p">.</span><span class="nx">setHeader</span><span class="p">(</span><span class="s2">&quot;Authorization&quot;</span><span class="p">,</span> <span class="s2">&quot;Basic &quot;</span> <span class="o">+</span> <span class="k">new</span> <span class="nx">Buffer</span><span class="p">(</span><span class="nx">client_id</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nx">client_secret</span><span class="p">).</span><span class="nx">toString</span><span class="p">(</span><span class="s2">&quot;base64&quot;</span><span class="p">));</span>
       <span class="nx">request</span><span class="p">.</span><span class="nx">setHeader</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">,</span> <span class="s2">&quot;application/x-www-form-urlencoded&quot;</span><span class="p">);</span>
+      <span class="nx">request</span><span class="p">.</span><span class="nx">setHeader</span><span class="p">(</span><span class="s2">&quot;Content-Length&quot;</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span> <span class="o">?</span> <span class="nx">data</span><span class="p">.</span><span class="nx">length</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span> <span class="o">:</span> <span class="s2">&quot;0&quot;</span><span class="p">));</span>
 
       <span class="k">if</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">request</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="nx">querystring</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">data</span><span class="p">));</span>
+        <span class="nx">request</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
       <span class="p">}</span>
       <span class="nx">request</span><span class="p">.</span><span class="nx">end</span><span class="p">();</span>
     <span class="p">}</span>
@@ -197,7 +198,7 @@ into an access token for data access.</p>
     <span class="k">if</span> <span class="p">(</span><span class="nx">redirect_uri</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">options</span><span class="p">.</span><span class="nx">redirect_uri</span> <span class="o">=</span> <span class="nx">redirect_uri</span><span class="p">;</span>
     <span class="p">}</span>
-    <span class="k">return</span> <span class="s2">&quot;https://&quot;</span> <span class="o">+</span> <span class="nx">api_endpoint</span> <span class="o">+</span> <span class="s2">&quot;/auth/code?&quot;</span> <span class="o">+</span> <span class="nx">querystring</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">options</span><span class="p">);</span>
+    <span class="k">return</span> <span class="s2">&quot;https://&quot;</span> <span class="o">+</span> <span class="nx">Config</span><span class="p">.</span><span class="nx">api_endpoint</span> <span class="o">+</span> <span class="s2">&quot;/auth/code?&quot;</span> <span class="o">+</span> <span class="nx">querystring</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">options</span><span class="p">);</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p><strong>obtain<em>access</em>token</strong> - Exchange authorization code or refresh token for access token.</p>
 
 <ul>
@@ -258,11 +259,15 @@ into an access token for data access.</p>
       <span class="p">});</span>
       <span class="nx">agent</span><span class="p">.</span><span class="nx">figo_request</span> <span class="o">=</span> <span class="nx">request</span><span class="p">;</span>
 
+      <span class="k">if</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">data</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+      <span class="p">}</span>
       <span class="nx">request</span><span class="p">.</span><span class="nx">setHeader</span><span class="p">(</span><span class="s2">&quot;Authorization&quot;</span><span class="p">,</span> <span class="s2">&quot;Bearer &quot;</span> <span class="o">+</span> <span class="nx">access_token</span><span class="p">);</span>
       <span class="nx">request</span><span class="p">.</span><span class="nx">setHeader</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">,</span> <span class="s2">&quot;application/json&quot;</span><span class="p">);</span>
+      <span class="nx">request</span><span class="p">.</span><span class="nx">setHeader</span><span class="p">(</span><span class="s2">&quot;Content-Length&quot;</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span> <span class="o">?</span> <span class="nx">data</span><span class="p">.</span><span class="nx">length</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span> <span class="o">:</span> <span class="s2">&quot;0&quot;</span><span class="p">));</span>
 
       <span class="k">if</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">request</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">data</span><span class="p">));</span>
+        <span class="nx">request</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
       <span class="p">}</span>
       <span class="nx">request</span><span class="p">.</span><span class="nx">end</span><span class="p">();</span>
     <span class="p">}</span>
@@ -359,7 +364,7 @@ synchronized, which have not been synchronized within the specified number of mi
       <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
         <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
       <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;https://&quot;</span> <span class="o">+</span> <span class="nx">api_endpoint</span> <span class="o">+</span> <span class="s2">&quot;/task/start?id=&quot;</span> <span class="o">+</span> <span class="nx">result</span><span class="p">.</span><span class="nx">task_token</span><span class="p">);</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;https://&quot;</span> <span class="o">+</span> <span class="nx">Config</span><span class="p">.</span><span class="nx">api_endpoint</span> <span class="o">+</span> <span class="s2">&quot;/task/start?id=&quot;</span> <span class="o">+</span> <span class="nx">result</span><span class="p">.</span><span class="nx">task_token</span><span class="p">);</span>
       <span class="p">}</span>
     <span class="p">});</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p><strong>get_notifications</strong> - Request list of registered notifications.</p>
@@ -418,10 +423,17 @@ synchronized, which have not been synchronized within the specified number of mi
 
 <ul>
 <li><p><strong>notification</strong> (<code>Notification</code>) - modified notification object</p></li>
-<li><p><strong>callback</strong> (<code>Function</code>) - callback function with one parameter: <code>error</code></p></li>
+<li><p><strong>callback</strong> (<code>Function</code>) - callback function with one parameter: <code>error</code> and <code>result</code>;
+  The result parameter is the modified <code>Notification</code> object.</p></li>
 </ul></div></div><div class="code"><div class="wrapper">  <span class="k">this</span><span class="p">.</span><span class="nx">modify_notification</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">notification</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">observe_key</span><span class="o">:</span> <span class="nx">notification</span><span class="p">.</span><span class="nx">observe_key</span><span class="p">,</span> <span class="nx">notify_uri</span><span class="o">:</span> <span class="nx">notification</span><span class="p">.</span><span class="nx">notify_uri</span><span class="p">,</span> <span class="nx">state</span><span class="o">:</span> <span class="nx">notification</span><span class="p">.</span><span class="nx">state</span> <span class="p">};</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">query_api</span><span class="p">(</span><span class="s2">&quot;/rest/notifications/&quot;</span> <span class="o">+</span> <span class="nx">notification</span><span class="p">.</span><span class="nx">notification_id</span><span class="p">,</span> <span class="nx">options</span><span class="p">,</span> <span class="s2">&quot;PUT&quot;</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">query_api</span><span class="p">(</span><span class="s2">&quot;/rest/notifications/&quot;</span> <span class="o">+</span> <span class="nx">notification</span><span class="p">.</span><span class="nx">notification_id</span><span class="p">,</span> <span class="nx">options</span><span class="p">,</span> <span class="s2">&quot;PUT&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">notification</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p><strong>remove_notification</strong> - Unregister notification.</p>
 
 <ul>
@@ -439,6 +451,7 @@ synchronized, which have not been synchronized within the specified number of mi
   <span class="nx">Transaction</span><span class="o">:</span>           <span class="nx">models</span><span class="p">.</span><span class="nx">Transaction</span><span class="p">,</span>
   <span class="nx">SynchronizationStatus</span><span class="o">:</span> <span class="nx">models</span><span class="p">.</span><span class="nx">SynchronizationStatus</span><span class="p">,</span>
   <span class="nx">Notification</span><span class="o">:</span>          <span class="nx">models</span><span class="p">.</span><span class="nx">Notification</span><span class="p">,</span>
+  <span class="nx">Config</span><span class="o">:</span>                <span class="nx">Config</span><span class="p">,</span>
   <span class="nx">Connection</span><span class="o">:</span>            <span class="nx">Connection</span><span class="p">,</span>
   <span class="nx">Session</span><span class="o">:</span>               <span class="nx">Session</span>
 <span class="p">};</span></div></div></div></div></body></html>

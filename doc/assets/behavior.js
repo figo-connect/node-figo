@@ -13,20 +13,10 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "commentsOnly": true,
           "name": "Markdown"
         },
-        "sourcePath": "/Users/micha/node-figo/README.md",
+        "sourcePath": "/Users/micha/figo/node-figo/README.md",
         "projectPath": "README.md",
         "targetPath": "index",
-        "firstHeader": {
-          "type": "heading",
-          "data": {
-            "level": 1,
-            "title": "node-figo",
-            "slug": "node-figo",
-            "isFileHeader": true
-          },
-          "depth": 1
-        },
-        "title": "node-figo"
+        "title": "index"
       },
       "depth": 1,
       "outline": [
@@ -57,7 +47,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "singleLineComment": ["//"],
               "name": "JavaScript"
             },
-            "sourcePath": "/Users/micha/node-figo/lib/figo.js",
+            "sourcePath": "/Users/micha/figo/node-figo/lib/figo.js",
             "projectPath": "lib/figo.js",
             "targetPath": "lib/figo",
             "title": "figo"
@@ -65,6 +55,14 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "depth": 2,
           "outline": [
             {
+              "type": "heading",
+              "data": {
+                "level": 3,
+                "title": "Global configuration.",
+                "slug": "global-configuration"
+              },
+              "depth": 3
+            }, {
               "type": "heading",
               "data": {
                 "level": 3,
@@ -115,7 +113,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "singleLineComment": ["//"],
               "name": "JavaScript"
             },
-            "sourcePath": "/Users/micha/node-figo/lib/models.js",
+            "sourcePath": "/Users/micha/figo/node-figo/lib/models.js",
             "projectPath": "lib/models.js",
             "targetPath": "lib/models",
             "title": "models"

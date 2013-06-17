@@ -5,9 +5,15 @@
   "author": "Michael Haller <michael.haller@figo.me>",
   "license" : "MIT",
   "main": "./lib/figo.js",
+  "scripts": {
+    "test": "vows --spec test/*"
+  },
   "repository": { 
     "type": "git",
     "url": "https://github.com/figo-connect/node-figo.git"
+  },
+  "devDependencies": {
+    "vows": ">=0.7.0"
   },
   "engines": {
     "node": ">=0.8.0"
