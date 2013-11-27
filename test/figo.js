@@ -27,7 +27,9 @@ var figo   = require("../lib/figo");
 
 // Use our staging server for unit tests.
 figo.Config.api_endpoint = "api.staging.figo.me";
-figo.Config.valid_fingerprints = [ "AF:FF:C3:2A:45:13:86:FB:28:57:55:80:0A:58:23:C7:7A:70:B6:2D" ];
+figo.Config.valid_fingerprints = [ "A6:FE:08:F4:A8:86:F9:C1:BF:4E:70:0A:BD:72:AE:B8:8E:B7:78:52",
+                                   "AD:A0:E3:2B:1F:CE:E8:44:F2:83:BA:AE:E4:7D:F2:AD:44:48:7F:1E",
+                                   "E0:46:84:06:D0:1B:0B:6E:3D:3F:7F:A4:F5:D7:32:C2:56:BA:2F:0A" ];
 
 
 // Demo access token.
