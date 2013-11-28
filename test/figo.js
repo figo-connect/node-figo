@@ -29,7 +29,8 @@ var figo   = require("../lib/figo");
 figo.Config.api_endpoint = "api.staging.figo.me";
 figo.Config.valid_fingerprints = [ "A6:FE:08:F4:A8:86:F9:C1:BF:4E:70:0A:BD:72:AE:B8:8E:B7:78:52",
                                    "AD:A0:E3:2B:1F:CE:E8:44:F2:83:BA:AE:E4:7D:F2:AD:44:48:7F:1E",
-                                   "E0:46:84:06:D0:1B:0B:6E:3D:3F:7F:A4:F5:D7:32:C2:56:BA:2F:0A" ];
+                                   "E0:46:84:06:D0:1B:0B:6E:3D:3F:7F:A4:F5:D7:32:C2:56:BA:2F:0A",
+                                   "21:2D:B9:E0:6F:8E:B7:FE:23:37:A2:C1:D0:52:90:5D:BD:8D:BE:0B" ];
 
 
 // Demo access token.
