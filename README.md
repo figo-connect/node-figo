@@ -1,4 +1,4 @@
-node-figo [![Build Status](https://secure.travis-ci.org/figo-connect/node-figo.png)](https://travis-ci.org/figo-connect/node-figo) [![npm version]http://img.shields.io/npm/v/figo.svg](https://www.npmjs.org/package/figo)
+node-figo [![Build Status](https://secure.travis-ci.org/figo-connect/node-figo.png)](https://travis-ci.org/figo-connect/node-figo) [![npm version](http://img.shields.io/npm/v/figo.svg)](https://www.npmjs.org/package/figo)
 =========
 
 Node.js bindings for the figo Connect API: http://docs.figo.io
