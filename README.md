@@ -1,7 +1,7 @@
-node-figo [![Build Status](https://secure.travis-ci.org/figo-connect/node-figo.png)](https://travis-ci.org/figo-connect/node-figo)
+node-figo [![Build Status](https://secure.travis-ci.org/figo-connect/node-figo.png)](https://travis-ci.org/figo-connect/node-figo) [![npm version]http://img.shields.io/npm/v/figo.svg](https://www.npmjs.org/package/figo)
 =========
 
-Node.js bindings for the figo Connect API: http://developer.figo.me
+Node.js bindings for the figo Connect API: http://docs.figo.io
 
 Usage
 =====
@@ -90,8 +90,3 @@ var process_redirect = function(authorization_code, state) {
   });
 };
 ```
-
-You can find more documentation at
-[https://github.com/figo-connect/node-figo/blob/master/doc/lib/figo.html](http://htmlpreview.github.io/?https://github.com/figo-connect/node-figo/blob/master/doc/lib/figo.html)
-and
-[https://github.com/figo-connect/node-figo/blob/master/doc/lib/models.html](http://htmlpreview.github.io/?https://github.com/figo-connect/node-figo/blob/master/doc/lib/models.html)
