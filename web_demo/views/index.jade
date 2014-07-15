@@ -1,0 +1,43 @@
+extends layout
+
+block content
+  if current_account
+    h1= current_account.name
+
+    .panel.panel-default
+      .panel-heading Account Details
+      .panel-body
+        ul.list-group
+          li.list-group-item Owner:
+            = current_account.owner
+          li.list-group-item Account Number:
+            = current_account.account_number
+          li.list-group-item Bank Code:
+            = current_account.bank_code
+          li.list-group-item IBAN:
+            = current_account.iban
+          li.list-group-item Balance:
+            = current_account.balance.balance
+            = current_account.currency
+  else
+    h1 Unified Inbox
+
+  table.table.table-hover.table-condensed
+    thead
+      tr
+        th Date
+        th Name
+        th Account Number
+        th Purpose
+        th(style="text-align: right;") Amount
+    tbody
+      each transaction in transactions
+        tr
+          td= transaction.value_date.toDateString()
+          td= transaction.name
+          td= transaction.account_number
+          td= transaction.purpose
+          if transaction.amount < 0
+            td(style="text-align: right; color: red;")= transaction.amount
+          else
+            td(style="text-align: right;")= transaction.amount

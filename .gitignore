@@ -1,4 +1,5 @@
 /node_modules/
+/web_demo/node_modules/
 lib-cov
 *.seed
 *.log

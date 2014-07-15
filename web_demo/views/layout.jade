@@ -1,0 +1,41 @@
+doctype html
+html
+  head
+    title figo web banking
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+
+    // Bootstrap
+    link(rel="stylesheet", href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css")
+
+    link(href="/images/favicon.ico", rel="shortcut icon")
+    link(href="/stylesheets/style.css", rel="stylesheet", media="screen")
+
+  body
+    .navbar.navbar-inverse.navbar-fixed-top(role="navigation")
+      .container-fluid
+        .navbar-header
+          a.navbar-brand(href="/") figo web banking
+        .navbar-collapse.collapse
+          ul.nav.navbar-nav
+            if !current_account
+              li.active: a(href="/") Unified Inbox
+            else
+              li: a(href="/") Unified Inbox
+            if accounts
+              each account in accounts
+                if current_account && account.account_id == current_account.account_id
+                  li.active: a(href="/"+account.account_id)= account.name
+                else
+                  li: a(href="/"+account.account_id)= account.name
+          if user
+            p.navbar-text.navbar-right Signed in as&nbsp;
+              a.navbar-link(href="/logout")= user.email
+    .container-fluid(role="main")
+      if error
+        .alert.alert-error= error
+      block content
+
+    // jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    script(src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js")
+    // Include all compiled plugins (below), or include individual files as needed -->
+    script(src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js")
