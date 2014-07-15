@@ -23,27 +23,22 @@ var session = new figo.Session("ASHWLIkouP2O6_bgA2wWReRhletgWKHYjLqDaqb0LFfamim9
 // Print out list of account numbers and balances.
 session.get_accounts(function(error, accounts) {
   if (!error) {
-    async.mapSeries(accounts, function(account, callback) {
-      account.get_balance(callback);
-    }, function(error, balances) {
-      for (var i = 0; i < accounts.length; i++) {
-        console.log(accounts[i].account_number);
-        console.log(balances[i].balance);
+    accounts.forEach(function(account) {
+        console.log(account.account_number);
+        console.log(account.balance.balance);
+    })
+
+    // Print out the list of all transaction originators/recipients of a specific account.
+    session.get_account("A1.1", function(error, account) {
+      if (!error) {
+        account.get_transactions(null, function(error, transactions) {
+          if (!error) {
+            transactions.forEach(function(transaction) {
+              console.log(transaction.name);
+            });
+          }
+        });
       }
-
-      // Print out the list of all transaction originators/recipients of a specific account.
-      session.get_account("A1.1", function(error, account) {
-        if (!error) {
-          account.get_transactions(null, function(error, transactions) {
-            if (!error) {
-              for (var i = 0; i < transactions.length; i++) {
-                console.log(transactions[i].name);
-              }
-            }
-          });
-        }
-      });
-
     });
   }
 });
@@ -58,7 +53,7 @@ var open = require("open");
 var connection = new figo.Connection("<client ID>", "<client secret>", "http://my-domain.org/redirect-url");
 
 var start_login = function() {
-  // Open webbrowser to kick of the login process.
+  // Open web browser to kick of the login process.
   open(connection.login_url("qweqwe"));
 };
 
@@ -75,18 +70,22 @@ var process_redirect = function(authorization_code, state) {
     if (!error) {
 
       // Start session.
-      var session = new figo.Session(token_dict["access_token"]);
+      var session = new figo.Session(token_dict.access_token);
 
       // Print out list of account numbers.
       session.get_accounts(function(error, accounts) {
         if (!error) {
-          for (var i = 0; i < accounts.length; i++) {
-            console.log(accounts[i].account_number);
-          }
+          accounts.forEach(function(account) {
+            console.log(account.account_number);
+          })
         }
       });
-
     }
   });
 };
 ```
+
+Demos
+-----
+In this repository you can also have a look at a simple console(console_demo.js) and web demo(web_demo).
+While the console demo simply accesses the figo API, the web demo implements the full OAuth flow.
