@@ -24,7 +24,9 @@ var assert = require("assert");
 var expect = require('expect.js');
 var figo   = require("../lib/figo");
 
-// Demo access token.
+// Demo client
+var client_id = "CaESKmC8MAhNpDe5rvmWnSkRE_7pkkVIIgMwclgzGcQY";
+var client_secret = "STdzfv0GXtEj_bwYn7AgCVszN1kKq5BdgEIKOM_fzybQ";
 var access_token = "ASHWLIkouP2O6_bgA2wWReRhletgWKHYjLqDaqb0LFfamim9RjexTo22ujRIP_cjLiRiSyQXyt2kM1eXU2XLFZQ0Hro15HikJQT_eNeT_9XQ";
 
 // enabling stack traces
@@ -37,7 +39,43 @@ describe("The figo session", function() {
     new figo.Session(access_token).get_accounts(function(error, accounts) {
       expect(error).to.be(null);
       expect(accounts).to.be.an("array");
-      expect(accounts).to.have.length(2);
+      expect(accounts).to.have.length(3);
+      done();
+    });
+  });
+
+  it("should list all supported banks, credit cards, other payment services", function(done) {
+    new figo.Session(access_token).get_supported_payment_services("de", function(error, services) {
+      expect(error).to.be(null);
+      expect(services).to.be.an("object");
+      expect(services).to.include.keys("banks", "services");
+      done();
+    });
+  });
+
+  it("should list all supported credit cards and other payment services", function(done) {
+    new figo.Session(access_token).get_supported_payment_services("de", "services", function(error, services) {
+      expect(error).to.be(null);
+      expect(services).to.be.an("object");
+      expect(services).to.include.keys("services");
+      done();
+    });
+  });
+
+  it("should list all supported banks", function(done) {
+    new figo.Session(access_token).get_supported_payment_services("de", "banks", function(error, services) {
+      expect(error).to.be(null);
+      expect(services).to.be.an("object");
+      expect(services).to.include.keys("banks");
+      done();
+    });
+  });
+
+  it("should list login settings for a bank or service", function(done) {
+    new figo.Session(access_token).get_login_settings("de", "90090042", function(error, login_settings) {
+      expect(error).to.be(null);
+      expect(login_settings).to.be.an("object");
+      expect(login_settings).to.include.keys("bank_name", "supported", "icon", "additional_icons", "credentials", "auth_type", "advice");
       done();
     });
   });
