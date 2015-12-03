@@ -21,7 +21,8 @@
 //
 
 var assert = require("assert");
-var expect = require('expect.js');
+var expect = require("expect.js");
+var chai = require("chai");
 var figo   = require("../lib/figo");
 
 // Demo client
@@ -85,6 +86,27 @@ describe("The figo session", function() {
       expect(error).to.be(null);
       expect(transactions).to.be.an("array");
       expect(transactions.length).to.be.above(0);
+      chai.expect(transactions[0]).to.contain.all.keys("transaction_id");
+      done();
+    });
+  });
+
+  it("should list all standing orders", function(done) {
+    new figo.Session(access_token).get_standing_orders(null, function(error, standing_orders) {
+      expect(error).to.be(null);
+      expect(standing_orders).to.be.an("array");
+      expect(standing_orders.length).to.be.above(0);
+      chai.expect(standing_orders[0]).to.contain.all.keys("standing_order_id");
+      done();
+    });
+  });
+
+  it("should list all securities", function(done) {
+    new figo.Session(access_token).get_securities(null, function(error, securities) {
+      expect(error).to.be(null);
+      expect(securities).to.be.an("array");
+      expect(securities.length).to.be.above(-1);
+      if (securities.length) chai.expect(securities[0]).to.contain.all.keys("security_id");
       done();
     });
   });
@@ -94,6 +116,7 @@ describe("The figo session", function() {
       expect(error).to.be(null);
       expect(payments).to.be.an("array");
       expect(payments.length).to.be.above(-1);
+      if (payments.length) chai.expect(payments[0]).to.contain.all.keys("payment_id");
       done();
     });
   });

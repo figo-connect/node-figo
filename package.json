@@ -13,6 +13,7 @@
     "url": "https://github.com/figo-connect/node-figo.git"
   },
   "devDependencies": {
+    "chai": "",
     "mocha": "",
     "expect.js": ""
   },
