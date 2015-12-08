@@ -46,7 +46,7 @@ describe("The figo session", function() {
   });
 
   it("should list all supported banks, credit cards, other payment services", function(done) {
-    new figo.Session(access_token).get_supported_payment_services("de", function(error, services) {
+    new figo.Session(access_token).get_supported_payment_services("de", null, function(error, services) {
       expect(error).to.be(null);
       expect(services).to.be.an("object");
       expect(services).to.include.keys("banks", "services");
