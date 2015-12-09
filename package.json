@@ -1,7 +1,7 @@
 {
   "name": "figo",
   "description": "API wrapper for figo Connect.",
-  "version": "1.1.2",
+  "version": "1.2",
   "author": "Stefan Richter <stefan.richter@figo.me>",
   "license" : "MIT",
   "main": "./lib/figo.js",
