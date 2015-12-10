@@ -28,14 +28,15 @@ var figo   = require("../lib/figo");
 // Demo client
 var client_id = "CaESKmC8MAhNpDe5rvmWnSkRE_7pkkVIIgMwclgzGcQY";
 var client_secret = "STdzfv0GXtEj_bwYn7AgCVszN1kKq5BdgEIKOM_fzybQ";
-var access_token = "ASHWLIkouP2O6_bgA2wWReRhletgWKHYjLqDaqb0LFfamim9RjexTo22ujRIP_cjLiRiSyQXyt2kM1eXU2XLFZQ0Hro15HikJQT_eNeT_9XQ";
+//var access_token = "ASHWLIkouP2O6_bgA2wWReRhletgWKHYjLqDaqb0LFfamim9RjexTo22ujRIP_cjLiRiSyQXyt2kM1eXU2XLFZQ0Hro15HikJQT_eNeT_9XQ";
+var access_token = "ALMXfrGOVCsYathga4AjH8DDgFl81VfELu29mF0JVg4rkllQdZT5SVAZzJmDxmIEqvoDKqVIIpj7yAeW2hV3dOAz2XTzI-KplXcb-ZA1KCQs";
 
 // enabling stack traces
 process.on('uncaughtException', function(err) {
   console.log('Caught exception: ' + err.stack);
 });
 
-describe("The figo session", function() {
+describe("The figo session", function() {/*
   it("should list all accounts", function(done) {
     new figo.Session(access_token).get_accounts(function(error, accounts) {
       expect(error).to.be(null);
@@ -43,8 +44,17 @@ describe("The figo session", function() {
       expect(accounts).to.have.length(3);
       done();
     });
-  });
+  });*/
 
+  it("should allow to add an account", function(done) {
+    new figo.Session(access_token).add_account("de", ["figo", "figo"], "90090042", null, null, function(error, task_token) {
+      expect(error).to.be(null);
+      expect(task_token).to.be.an("object");
+      chai.expect(task_token).to.have.all.keys("session", "task_token");
+      done();
+    });
+  });
+/*
   it("should list all supported banks, credit cards, other payment services", function(done) {
     new figo.Session(access_token).get_supported_payment_services("de", null, function(error, services) {
       expect(error).to.be(null);
@@ -266,5 +276,5 @@ describe("The figo session", function() {
         });
       });
     });
-  });
+  });*/
 });
