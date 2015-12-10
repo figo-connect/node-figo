@@ -22,14 +22,13 @@
 
 var assert = require("assert");
 var expect = require("expect.js");
-var chai = require("chai");
+var chai   = require("chai");
 var figo   = require("../lib/figo");
 
 // Demo client
 var client_id = "CaESKmC8MAhNpDe5rvmWnSkRE_7pkkVIIgMwclgzGcQY";
 var client_secret = "STdzfv0GXtEj_bwYn7AgCVszN1kKq5BdgEIKOM_fzybQ";
-//var access_token = "ASHWLIkouP2O6_bgA2wWReRhletgWKHYjLqDaqb0LFfamim9RjexTo22ujRIP_cjLiRiSyQXyt2kM1eXU2XLFZQ0Hro15HikJQT_eNeT_9XQ";
-var access_token = "ALMXfrGOVCsYathga4AjH8DDgFl81VfELu29mF0JVg4rkllQdZT5SVAZzJmDxmIEqvoDKqVIIpj7yAeW2hV3dOAz2XTzI-KplXcb-ZA1KCQs";
+var access_token = "ASHWLIkouP2O6_bgA2wWReRhletgWKHYjLqDaqb0LFfamim9RjexTo22ujRIP_cjLiRiSyQXyt2kM1eXU2XLFZQ0Hro15HikJQT_eNeT_9XQ";
 
 // enabling stack traces
 process.on('uncaughtException', function(err) {
