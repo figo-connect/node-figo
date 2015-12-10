@@ -36,7 +36,7 @@ process.on('uncaughtException', function(err) {
   console.log('Caught exception: ' + err.stack);
 });
 
-describe("The figo session", function() {/*
+describe("The figo session", function() {
   it("should list all accounts", function(done) {
     new figo.Session(access_token).get_accounts(function(error, accounts) {
       expect(error).to.be(null);
@@ -44,7 +44,7 @@ describe("The figo session", function() {/*
       expect(accounts).to.have.length(3);
       done();
     });
-  });*/
+  });
 
   it("should allow to add an account", function(done) {
     new figo.Session(access_token).add_account("de", ["figo", "figo"], "90090042", null, null, function(error, task_token) {
@@ -54,7 +54,7 @@ describe("The figo session", function() {/*
       done();
     });
   });
-/*
+
   it("should list all supported banks, credit cards, other payment services", function(done) {
     new figo.Session(access_token).get_supported_payment_services("de", null, function(error, services) {
       expect(error).to.be(null);
@@ -276,5 +276,5 @@ describe("The figo session", function() {/*
         });
       });
     });
-  });*/
+  });
 });
