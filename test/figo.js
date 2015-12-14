@@ -240,7 +240,15 @@ describe("The figo session", function() {
 
   it("should allow management of a payment", function(done) {
     var session = new figo.Session(access_token);
-    session.add_payment(new figo.Payment(session, {account_id: "A1.1", type: "Transfer", account_number: "4711951501", bank_code: "90090042", name: "figo", purpose: "Thanks for all the fish.", amount: 0.89}), function(error, payment) {
+    session.add_payment(new figo.Payment(session, {
+      account_id: "A1.1",
+      type: "Transfer",
+      account_number: "4711951501",
+      bank_code: "90090042",
+      name: "Mönckebergstraße",
+      purpose: "Приятных покупок!",
+      amount: 0.89000000000000001
+    }), function(error, payment) {
       expect(error).to.be(null);
       expect(payment).to.be.an("object");
       expect(payment.account_id).to.be("A1.1");
