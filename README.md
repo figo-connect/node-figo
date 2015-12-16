@@ -69,9 +69,8 @@ var name            = "John Doe";
 var email           = "john.doe@example.com";
 var password        = "Swordfish";
 var language        = "en";
-var send_newsletter = true;
 
-connection.create_user(name, email, password, language, send_newsletter, function(error, recovery_password) {
+connection.create_user(name, email, password, language, null, function(error, recovery_password) {
   if (error) {
     console.error(error);
   } else {
