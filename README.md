@@ -206,6 +206,23 @@ figo Connect API allows you not only to get an information related to bank accou
 2. Second, you need to submit the newly created payment to the bank itself via the figo Connect API.
 Although any interaction with the API is done live, customer bank's servers might take some time to reply. In order to handle this figo Connect API will create a [background task](http://docs.figo.io/#task-processing) and will return a task token to your application on step two. Using this task token you can later poll the result of the task execution.
 
+Tests
+-----
+
+### Running the Unit Tests
+
+Make sure you have all the necessary dependencies:
+
+```bash
+npm install
+```
+
+And then run the unit tests:
+
+```bash
+npm test
+```
+
 License
 -------
 
@@ -233,3 +250,8 @@ Changelog and New Features
 ### 1.1.1
 
 Initial public release.
+
+Contributing and Bug Reporting
+------------------------------
+
+Please submit bug reports and your suggestions to the GitHub [issue tracker](https://github.com/figo-connect/node-figo/issues). Feel free to add pull requests as well.
