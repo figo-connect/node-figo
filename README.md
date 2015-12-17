@@ -102,7 +102,7 @@ Once you have an access token you can perform the rest of operations with the AP
 
 ### Session
 
-But first create a session using the access token from previous step:
+But first create a session using the access token from the previous step:
 
 ```javascript
 var session = new figo.Session(access_token);
@@ -180,6 +180,30 @@ session.get_securities(null, function(error, securities) {
   }
 });
 ```
+
+#### Payments
+
+##### Retrieve all or one payment(s)
+
+```javascript
+// Retrieve all available payments
+session.get_payments(null, function(error, payments) {
+  if (error) {
+    console.error(error);
+  } else {
+    payments.forEach(function(payment) {
+      console.log(payment.payment_id, payment.amount, payment.currency, payment.purpose);
+    })
+  }
+});
+```
+
+##### Create a single payment
+
+figo Connect API allows you not only to get an information related to bank accounts, but also to submit wire transfers on behalf of the account owner which is a two-step process:
+1. First, you have to compile a payment object and submit it to the figo Connect API.
+2. Second, you need to submit the newly created payment to the bank itself via the figo Connect API.
+Although any interaction with the API is done live, customer bank's servers might take some time to reply. In order to handle this figo Connect API will create a [background task](http://docs.figo.io/#task-processing) and will return a task token to your application on step two. Using this task token you can later poll the result of the task execution.
 
 License
 -------
