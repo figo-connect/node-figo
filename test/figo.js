@@ -21,10 +21,13 @@
 //
 
 var assert = require("assert");
-var expect = require('expect.js');
+var expect = require("expect.js");
+var chai   = require("chai");
 var figo   = require("../lib/figo");
 
-// Demo access token.
+// Demo client
+var client_id = "CaESKmC8MAhNpDe5rvmWnSkRE_7pkkVIIgMwclgzGcQY";
+var client_secret = "STdzfv0GXtEj_bwYn7AgCVszN1kKq5BdgEIKOM_fzybQ";
 var access_token = "ASHWLIkouP2O6_bgA2wWReRhletgWKHYjLqDaqb0LFfamim9RjexTo22ujRIP_cjLiRiSyQXyt2kM1eXU2XLFZQ0Hro15HikJQT_eNeT_9XQ";
 
 // enabling stack traces
@@ -37,7 +40,52 @@ describe("The figo session", function() {
     new figo.Session(access_token).get_accounts(function(error, accounts) {
       expect(error).to.be(null);
       expect(accounts).to.be.an("array");
-      expect(accounts).to.have.length(2);
+      expect(accounts).to.have.length(3);
+      done();
+    });
+  });
+
+  it("should allow to add an account", function(done) {
+    new figo.Session(access_token).add_account("de", ["figo", "figo"], "90090042", null, null, function(error, task_token) {
+      expect(error).to.be(null);
+      expect(task_token).to.be.an("object");
+      chai.expect(task_token).to.have.all.keys("session", "task_token");
+      done();
+    });
+  });
+
+  it("should list all supported banks, credit cards, other payment services", function(done) {
+    new figo.Session(access_token).get_supported_payment_services("de", null, function(error, services) {
+      expect(error).to.be(null);
+      expect(services).to.be.an("object");
+      expect(services).to.include.keys("banks", "services");
+      done();
+    });
+  });
+
+  it("should list all supported credit cards and other payment services", function(done) {
+    new figo.Session(access_token).get_supported_payment_services("de", "services", function(error, services) {
+      expect(error).to.be(null);
+      expect(services).to.be.an("object");
+      expect(services).to.include.keys("services");
+      done();
+    });
+  });
+
+  it("should list all supported banks", function(done) {
+    new figo.Session(access_token).get_supported_payment_services("de", "banks", function(error, services) {
+      expect(error).to.be(null);
+      expect(services).to.be.an("object");
+      expect(services).to.include.keys("banks");
+      done();
+    });
+  });
+
+  it("should list login settings for a bank or service", function(done) {
+    new figo.Session(access_token).get_login_settings("de", "90090042", function(error, login_settings) {
+      expect(error).to.be(null);
+      expect(login_settings).to.be.an("object");
+      expect(login_settings).to.include.keys("bank_name", "supported", "icon", "additional_icons", "credentials", "auth_type", "advice");
       done();
     });
   });
@@ -47,6 +95,27 @@ describe("The figo session", function() {
       expect(error).to.be(null);
       expect(transactions).to.be.an("array");
       expect(transactions.length).to.be.above(0);
+      chai.expect(transactions[0]).to.contain.all.keys("transaction_id");
+      done();
+    });
+  });
+
+  it("should list all standing orders", function(done) {
+    new figo.Session(access_token).get_standing_orders(null, function(error, standing_orders) {
+      expect(error).to.be(null);
+      expect(standing_orders).to.be.an("array");
+      expect(standing_orders.length).to.be.above(0);
+      chai.expect(standing_orders[0]).to.contain.all.keys("standing_order_id");
+      done();
+    });
+  });
+
+  it("should list all securities", function(done) {
+    new figo.Session(access_token).get_securities(null, function(error, securities) {
+      expect(error).to.be(null);
+      expect(securities).to.be.an("array");
+      expect(securities.length).to.be.above(-1);
+      if (securities.length) chai.expect(securities[0]).to.contain.all.keys("security_id");
       done();
     });
   });
@@ -56,6 +125,7 @@ describe("The figo session", function() {
       expect(error).to.be(null);
       expect(payments).to.be.an("array");
       expect(payments.length).to.be.above(-1);
+      if (payments.length) chai.expect(payments[0]).to.contain.all.keys("payment_id");
       done();
     });
   });
@@ -170,7 +240,15 @@ describe("The figo session", function() {
 
   it("should allow management of a payment", function(done) {
     var session = new figo.Session(access_token);
-    session.add_payment(new figo.Payment(session, {account_id: "A1.1", type: "Transfer", account_number: "4711951501", bank_code: "90090042", name: "figo", purpose: "Thanks for all the fish.", amount: 0.89}), function(error, payment) {
+    session.add_payment(new figo.Payment(session, {
+      account_id: "A1.1",
+      type: "Transfer",
+      account_number: "4711951501",
+      bank_code: "90090042",
+      name: "Mönckebergstraße",
+      purpose: "Приятных покупок!",
+      amount: 0.89000000000000001
+    }), function(error, payment) {
       expect(error).to.be(null);
       expect(payment).to.be.an("object");
       expect(payment.account_id).to.be("A1.1");

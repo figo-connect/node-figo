@@ -1,91 +1,257 @@
-node-figo [![Build Status](https://secure.travis-ci.org/figo-connect/node-figo.png)](https://travis-ci.org/figo-connect/node-figo) [![npm version](http://img.shields.io/npm/v/figo.svg)](https://www.npmjs.org/package/figo)
-=========
+figo Node.js SDK
+================
 
-Node.js bindings for the figo Connect API: http://docs.figo.io
+[![Build Status](https://secure.travis-ci.org/figo-connect/node-figo.png)](https://travis-ci.org/figo-connect/node-figo) [![npm version](http://img.shields.io/npm/v/figo.svg)](https://www.npmjs.org/package/figo)
 
-Usage
-=====
+figo Node.js SDK is a package that contains a set of wrappers for figo Connect API and enables you to start creating applications in a Node.js environment immediately.
 
-First, you've to install the package:
+figo Connect API
+----------------
+
+figo Connect API allows you easily access bank accounts including payments submitting and transaction history. Our main goal is to provide banking applications with rich user experience and seamless integration.
+
+For more information please check [our website](http://figo.io).
+
+### Get an API key
+
+To get started with figo Connect you have to register your application first. Request your personal credentials using our online [application form](http://figo.io/api_key.html) or just [email us](mailto:business@figo.io) and we will be more than happy to provide you with a client ID and a secret without any bureaucracy.
+
+The Latest Version
+------------------
+
+The latest version of this SDK can be found in [GitHub repository](https://github.com/figo-connect/node-figo).
+
+Documentation
+-------------
+
+Detailed API reference is available [online](http://docs.figo.io) on our website.
+
+Installation
+------------
+
+### Using npm
+
+To install the SDK via [npm](https://github.com/npm/npm) use following command:
 
 ```bash
-npm install -g figo
+npm install figo
 ```
 
-Now you can create a new session and access data:
+### Manually
+
+Just clone our repository with your preferred method. For example:
+
+```bash
+git clone git://github.com/figo-connect/node-figo.git
+```
+
+Usage
+-----
+
+Make a connection:
 
 ```javascript
 var figo = require("figo");
-var async = require("async");
 
-var session = new figo.Session("ASHWLIkouP2O6_bgA2wWReRhletgWKHYjLqDaqb0LFfamim9RjexTo22ujRIP_cjLiRiSyQXyt2kM1eXU2XLFZQ0Hro15HikJQT_eNeT_9XQ");
+// Demo client
+var client_id     = "CygnIYss8101KTkm1d0WgO4gFn4yvwWESKWfrVhhTkvE"; // Demo client ID
+var client_secret = "STsRqwSvVuZNoeV-vAZvLf8Zc3-qETEX9xAeb15qz5Oc"; // Demo client secret
 
-// Print out list of account numbers and balances.
+var connection = new figo.Connection(client_id, client_secret);
+```
+where `client_id` and `client_secret` are your application's credentials obtained from figo.
+
+And create the first figo user:
+
+```javascript
+// User personal data
+var name            = "John Doe";
+var email           = "john.doe@example.com";
+var password        = "Swordfish";
+var language        = "en";
+
+connection.create_user(name, email, password, language, null, function(error, recovery_password) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log(recovery_password);
+  }
+});
+```
+
+### Authentication
+
+From the figo Connect [API reference](http://docs.figo.io/#calling-the-figo-connect-api):
+> “In order to access any information belonging to a user, a client has to authenticate with a token linking itself to the user. This token is called an *access token* and contains information on the client, the user and the level of access the client has to the users data.”
+
+Log in to obtain such access token:
+
+```javascript
+var access_token = "";
+
+connection.credential_login(username, password, null, null, null, null, function(error, token) {
+  if (error) {
+    console.error(error);
+  } else {
+    access_token = token.access_token;
+  }
+});
+```
+
+Once you have an access token you can perform the rest of operations with the API.
+
+### Session
+
+But first create a session using the access token from the previous step:
+
+```javascript
+var session = new figo.Session(access_token);
+```
+
+### Examples
+
+#### Accounts
+
+##### Retrieve all bank accounts
+
+To get all the bank accounts user has chosen to share with your application use `get_accounts` function:
+
+```javascript
 session.get_accounts(function(error, accounts) {
-  if (!error) {
+  if (error) {
+    console.error(error);
+  } else {
     accounts.forEach(function(account) {
-        console.log(account.account_number);
-        console.log(account.balance.balance);
-    })
-
-    // Print out the list of all transaction originators/recipients of a specific account.
-    session.get_account("A1.1", function(error, account) {
-      if (!error) {
-        account.get_transactions(null, function(error, transactions) {
-          if (!error) {
-            transactions.forEach(function(transaction) {
-              console.log(transaction.name);
-            });
-          }
-        });
-      }
+      // Do whatever you want
+      console.log(account.account_number);
+      console.log(account.balance.balance);
     });
   }
 });
 ```
 
-It is just as simple to allow users to login through the API:
+#### Transactions
+
+##### Retrieve transactions of one or all accounts
 
 ```javascript
-var figo = require("figo");
-var open = require("open");
-
-var connection = new figo.Connection("<client ID>", "<client secret>", "http://my-domain.org/redirect-url");
-
-var start_login = function() {
-  // Open web browser to kick of the login process.
-  open(connection.login_url("qweqwe"));
-};
-
-var process_redirect = function(authorization_code, state) {
-  // Handle the redirect URL invocation from the initial start_login call.
-
-  // Ignore bogus redirects.
-  if (state !== "qweqwe") {
-    return;
+session.get_transactions(null, function(error, transactions) {
+  if (error) {
+    console.error(error);
+  } else {
+    transactions.forEach(function(transaction) {
+      // Do whatever you want
+      console.log(transaction.name);
+    });
   }
-
-  // Trade in authorization code for access token.
-  var token_dict = connection.obtain_access_token(authorization_code, null, function(error, token_dict) {
-    if (!error) {
-
-      // Start session.
-      var session = new figo.Session(token_dict.access_token);
-
-      // Print out list of account numbers.
-      session.get_accounts(function(error, accounts) {
-        if (!error) {
-          accounts.forEach(function(account) {
-            console.log(account.account_number);
-          })
-        }
-      });
-    }
-  });
-};
+});
 ```
 
-Demos
+#### Standing Orders
+
+##### Retrieve standing orders of one or all accounts
+
+```javascript
+session.get_standing_orders(false, function(error, standingOrders) {
+  if (error) {
+    console.error(error);
+  } else {
+    standingOrders.forEach(function(standingOrder) {
+      // Do whatever you want
+      console.log(standingOrder.standing_order_id, standingOrder.purpose, standingOrder.amount);
+    });
+  }
+});
+```
+
+#### Securities
+
+##### Retrieve securities of one or all accounts
+
+```javascript
+session.get_securities(null, function(error, securities) {
+  if (error) {
+    console.error(error);
+  } else {
+    securities.forEach(function(security) {
+      // Do whatever you want
+      console.log(security.security_id, security.amount, security.currency);
+    });
+  }
+});
+```
+
+#### Payments
+
+##### Retrieve all or one payment(s)
+
+```javascript
+// Retrieve all available payments
+session.get_payments(null, function(error, payments) {
+  if (error) {
+    console.error(error);
+  } else {
+    payments.forEach(function(payment) {
+      console.log(payment.payment_id, payment.amount, payment.currency, payment.purpose);
+    })
+  }
+});
+```
+
+##### Create a single payment
+
+figo Connect API allows you not only to get an information related to bank accounts, but also to submit wire transfers on behalf of the account owner which is a two-step process:
+
+1. First, you have to compile a payment object and submit it to the figo Connect API.
+2. Second, you need to submit the newly created payment to the bank itself via the figo Connect API.
+Although any interaction with the API is done live, customer bank's servers might take some time to reply. In order to handle this figo Connect API will create a [background task](http://docs.figo.io/#task-processing) and will return a task token to your application on step two. Using this task token you can later poll the result of the task execution.
+
+Tests
 -----
-In this repository you can also have a look at a simple console(console_demo.js) and web demo(web_demo).
-While the console demo simply accesses the figo API, the web demo implements the full OAuth flow.
+
+### Running the Unit Tests
+
+Make sure you have all the necessary dependencies:
+
+```bash
+npm install
+```
+
+And then run the unit tests:
+
+```bash
+npm test
+```
+
+License
+-------
+
+figo Node.js SDK is released under the [MIT License](http://opensource.org/licenses/MIT).
+
+Changelog and New Features
+--------------------------
+
+### 1.2.0
+
+- Added wrappers for the following API calls
+  - Authentication: Credential Login, Unlock a figo account;
+  - User Management: Start forgot password process, Re-send unlock code, Re-send verification email;
+  - Accounts: Set bank account sort order;
+  - Account setup & synchronization: Retrieve list of supported banks, credit cards, other payment services, Retrieve list of supported credit cards and other payment services, Retrieve list of all supported banks, Retrieve login settings for a bank or service, Setup new bank account;
+  - Transactions: Modify a transaction, Modify all transactions of one or all accounts, Delete a transaction;
+  - Standing Orders: Retrieve standing_orders of one or all accounts;
+  - Securities: Retrieve a security, Retrieve securities of one or all accounts, Modify a security, Modify all securities of one or all;
+  - Payments: Retrieve payment proposals;
+  - Task Processing: Begin task, Poll task state, Cancel a task;
+  - Business Process System: Begin process, Create a process;
+
+- Minor fixes
+
+### 1.1.1
+
+Initial public release.
+
+Contributing and Bug Reporting
+------------------------------
+
+Please submit bug reports and your suggestions to the GitHub [issue tracker](https://github.com/figo-connect/node-figo/issues). Feel free to add pull requests as well.
