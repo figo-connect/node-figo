@@ -34,7 +34,7 @@ Installation
 To install the SDK via [npm](https://github.com/npm/npm) use following command:
 
 ```bash
-npm install figo
+npm install figo@latest
 ```
 
 ### Manually
@@ -249,7 +249,7 @@ Changelog and New Features
 
 ### 1.1.1
 
-Initial public release.
+Previous release which was done before starting to maintain the above changelog.
 
 Contributing and Bug Reporting
 ------------------------------
