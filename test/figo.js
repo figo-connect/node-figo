@@ -45,51 +45,6 @@ describe("The figo session", function() {
     });
   });
 
-  it("should allow to add an account", function(done) {
-    new figo.Session(access_token).add_account("de", ["figo", "figo"], "90090042", null, null, function(error, task_token) {
-      expect(error).to.be(null);
-      expect(task_token).to.be.an("object");
-      chai.expect(task_token).to.have.all.keys("session", "task_token");
-      done();
-    });
-  });
-
-  it("should list all supported banks, credit cards, other payment services", function(done) {
-    new figo.Session(access_token).get_supported_payment_services("de", null, function(error, services) {
-      expect(error).to.be(null);
-      expect(services).to.be.an("object");
-      expect(services).to.include.keys("banks", "services");
-      done();
-    });
-  });
-
-  it("should list all supported credit cards and other payment services", function(done) {
-    new figo.Session(access_token).get_supported_payment_services("de", "services", function(error, services) {
-      expect(error).to.be(null);
-      expect(services).to.be.an("object");
-      expect(services).to.include.keys("services");
-      done();
-    });
-  });
-
-  it("should list all supported banks", function(done) {
-    new figo.Session(access_token).get_supported_payment_services("de", "banks", function(error, services) {
-      expect(error).to.be(null);
-      expect(services).to.be.an("object");
-      expect(services).to.include.keys("banks");
-      done();
-    });
-  });
-
-  it("should list login settings for a bank or service", function(done) {
-    new figo.Session(access_token).get_login_settings("de", "90090042", function(error, login_settings) {
-      expect(error).to.be(null);
-      expect(login_settings).to.be.an("object");
-      expect(login_settings).to.include.keys("bank_name", "supported", "icon", "additional_icons", "credentials", "auth_type", "advice");
-      done();
-    });
-  });
-
   it("should list all transactions", function(done) {
     new figo.Session(access_token).get_transactions(null, function(error, transactions) {
       expect(error).to.be(null);
