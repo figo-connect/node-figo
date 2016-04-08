@@ -24,6 +24,7 @@ var assert = require("assert");
 var expect = require("expect.js");
 var chai   = require("chai");
 var figo   = require("../lib/figo");
+var FigoError = require("../lib/errors").FigoError;
 
 // Demo client
 var client_id = "CaESKmC8MAhNpDe5rvmWnSkRE_7pkkVIIgMwclgzGcQY";
@@ -105,6 +106,14 @@ describe("The figo session", function() {
   it("should cope with errors", function(done) {
     new figo.Session(access_token).get_sync_url("http://localhost:3003/", "", function(error, result) {
       expect(error).to.be.an("object");
+
+      chai.expect(error).to.be.an.instanceof(Error);
+      chai.expect(error).to.be.an.instanceof(FigoError);
+
+      expect(error).to.have.property("stack");
+      var stackTraceIsProper = error.stack.indexOf('/lib/figo.js:') !== -1;
+      expect(stackTraceIsProper).to.be.true;
+
       expect(result).to.be(undefined);
       done();
     });
