@@ -186,6 +186,14 @@ describe("The figo session", function() {
   it("should cope with errors", function(done) {
     new figo.Session(access_token).get_sync_url("https://example.com", "", function(error, result) {
       expect(error).to.be.an("object");
+
+      chai.expect(error).to.be.an.instanceof(Error);
+      chai.expect(error).to.be.an.instanceof(FigoError);
+
+      expect(error).to.have.property("stack");
+      var stackTraceIsProper = error.stack.indexOf('/lib/figo.js:') !== -1;
+      expect(stackTraceIsProper).to.be.true;
+
       expect(result).to.be(undefined);
       done();
     });
