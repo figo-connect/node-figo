@@ -23,7 +23,8 @@
 var assert = require("assert");
 var expect = require("expect.js");
 var chai   = require("chai");
-var figo   = require("../lib/figo");
+
+var figo      = require("../lib/figo");
 var FigoError = require("../lib/errors").FigoError;
 
 // Demo client
@@ -57,7 +58,7 @@ describe("The figo session", function() {
       var stackTraceIsProper = error.stack.indexOf('/lib/figo.js:') !== -1;
       expect(stackTraceIsProper).to.be.true;
 
-      expect(result).to.be(undefined);
+      expect(task_token).to.be(undefined);
       done();
     });
   });
@@ -73,7 +74,7 @@ describe("The figo session", function() {
         var stackTraceIsProper = error.stack.indexOf('/lib/figo.js:') !== -1;
         expect(stackTraceIsProper).to.be.true;
 
-        expect(result).to.be(undefined);
+        expect(services).to.be(undefined);
         done();
     });
   });
@@ -89,7 +90,7 @@ describe("The figo session", function() {
         var stackTraceIsProper = error.stack.indexOf('/lib/figo.js:') !== -1;
         expect(stackTraceIsProper).to.be.true;
 
-        expect(result).to.be(undefined);
+        expect(services).to.be(undefined);
         done();
     });
   });
@@ -105,7 +106,7 @@ describe("The figo session", function() {
         var stackTraceIsProper = error.stack.indexOf('/lib/figo.js:') !== -1;
         expect(stackTraceIsProper).to.be.true;
 
-        expect(result).to.be(undefined);
+        expect(services).to.be(undefined);
         done();
     });
   });
@@ -121,7 +122,7 @@ describe("The figo session", function() {
         var stackTraceIsProper = error.stack.indexOf('/lib/figo.js:') !== -1;
         expect(stackTraceIsProper).to.be.true;
 
-        expect(result).to.be(undefined);
+        expect(login_settings).to.be(undefined);
         done();
     });
   });
