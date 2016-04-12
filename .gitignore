@@ -1,18 +1,24 @@
+# Dependencies
 /node_modules/
 /web_demo/node_modules/
+
+# Runtime data
+pids
+
+# Logs
+logs
+npm-debug.log
+*.log
+
+# Misc
+results
 lib-cov
 *.seed
-*.log
 *.csv
 *.dat
 *.out
 *.pid
 *.gz
 
-pids
-logs
-results
-
-npm-debug.log
-
+# Working notes
 TODO.md
