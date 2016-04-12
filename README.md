@@ -231,6 +231,10 @@ figo Node.js SDK is released under the [MIT License](http://opensource.org/licen
 Changelog and New Features
 --------------------------
 
+### 1.4.0
+
+- Errors are now instances of JavaScript standard built-in `Error` object
+
 ### 1.2.0
 
 - Added wrappers for the following API calls
