@@ -24,6 +24,7 @@ var assert = require("assert");
 var expect = require("expect.js");
 var chai   = require("chai");
 var figo   = require("../lib/figo");
+var FigoError = require("../lib/errors").FigoError;
 
 // Demo client
 var client_id = "CaESKmC8MAhNpDe5rvmWnSkRE_7pkkVIIgMwclgzGcQY";
@@ -32,7 +33,7 @@ var access_token = "ASHWLIkouP2O6_bgA2wWReRhletgWKHYjLqDaqb0LFfamim9RjexTo22ujRI
 
 // enabling stack traces
 process.on('uncaughtException', function(err) {
-  console.log('Caught exception: ' + err.stack);
+  console.error('Caught exception: ' + err.stack);
 });
 
 describe("The figo session", function() {
@@ -42,6 +43,86 @@ describe("The figo session", function() {
       expect(accounts).to.be.an("array");
       expect(accounts).to.have.length(3);
       done();
+    });
+  });
+
+  it("shouldn't allow to add an account", function(done) {
+    new figo.Session(access_token).add_account("de", ["figo", "figo"], "90090042", null, null, function(error, task_token) {
+      expect(error).to.be.an("object");
+
+      chai.expect(error).to.be.an.instanceof(Error);
+      chai.expect(error).to.be.an.instanceof(FigoError);
+
+      expect(error).to.have.property("stack");
+      var stackTraceIsProper = error.stack.indexOf('/lib/figo.js:') !== -1;
+      expect(stackTraceIsProper).to.be.true;
+
+      expect(result).to.be(undefined);
+      done();
+    });
+  });
+
+  it("shouldn't list all supported banks, credit cards, other payment services", function(done) {
+    new figo.Session(access_token).get_supported_payment_services("de", null, function(error, services) {
+        expect(error).to.be.an("object");
+
+        chai.expect(error).to.be.an.instanceof(Error);
+        chai.expect(error).to.be.an.instanceof(FigoError);
+
+        expect(error).to.have.property("stack");
+        var stackTraceIsProper = error.stack.indexOf('/lib/figo.js:') !== -1;
+        expect(stackTraceIsProper).to.be.true;
+
+        expect(result).to.be(undefined);
+        done();
+    });
+  });
+
+  it("shouldn't list all supported credit cards and other payment services", function(done) {
+    new figo.Session(access_token).get_supported_payment_services("de", "services", function(error, services) {
+        expect(error).to.be.an("object");
+
+        chai.expect(error).to.be.an.instanceof(Error);
+        chai.expect(error).to.be.an.instanceof(FigoError);
+
+        expect(error).to.have.property("stack");
+        var stackTraceIsProper = error.stack.indexOf('/lib/figo.js:') !== -1;
+        expect(stackTraceIsProper).to.be.true;
+
+        expect(result).to.be(undefined);
+        done();
+    });
+  });
+
+  it("shouldn't list all supported banks", function(done) {
+    new figo.Session(access_token).get_supported_payment_services("de", "banks", function(error, services) {
+        expect(error).to.be.an("object");
+
+        chai.expect(error).to.be.an.instanceof(Error);
+        chai.expect(error).to.be.an.instanceof(FigoError);
+
+        expect(error).to.have.property("stack");
+        var stackTraceIsProper = error.stack.indexOf('/lib/figo.js:') !== -1;
+        expect(stackTraceIsProper).to.be.true;
+
+        expect(result).to.be(undefined);
+        done();
+    });
+  });
+
+  it("should list login settings for a bank or service", function(done) {
+    new figo.Session(access_token).get_login_settings("de", "90090042", function(error, login_settings) {
+        expect(error).to.be.an("object");
+
+        chai.expect(error).to.be.an.instanceof(Error);
+        chai.expect(error).to.be.an.instanceof(FigoError);
+
+        expect(error).to.have.property("stack");
+        var stackTraceIsProper = error.stack.indexOf('/lib/figo.js:') !== -1;
+        expect(stackTraceIsProper).to.be.true;
+
+        expect(result).to.be(undefined);
+        done();
     });
   });
 
@@ -103,7 +184,7 @@ describe("The figo session", function() {
   });
 
   it("should cope with errors", function(done) {
-    new figo.Session(access_token).get_sync_url("http://localhost:3003/", "", function(error, result) {
+    new figo.Session(access_token).get_sync_url("https://example.com", "", function(error, result) {
       expect(error).to.be.an("object");
       expect(result).to.be(undefined);
       done();
