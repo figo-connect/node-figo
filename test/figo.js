@@ -234,8 +234,12 @@ describe("The figo session", function() {
     });
   });
 
-  it("should provie a sync URL", function(done) {
+  it("should provide a sync URL", function(done) {
     new figo.Session(access_token).get_sync_url("qwe", "qew", function(error, sync_url) {
+      if (error) {
+        console.error(error)
+        return done(error)
+      }
       expect(error).to.be(null);
       expect(sync_url).to.be.an("string");
       expect(sync_url.length).to.be.above(0);
@@ -270,7 +274,7 @@ describe("The figo session", function() {
 
           notification.session.remove_notification(notification, function(error, result) {
             expect(error).to.be(null);
-            expect(result).to.be(null);
+            expect(result).to.be('');
 
             notification.session.get_notification(notification.notification_id, function(error, result) {
               expect(error).to.be(null);
@@ -317,7 +321,7 @@ describe("The figo session", function() {
 
           payment.session.remove_payment(payment, function(error, result) {
             expect(error).to.be(null);
-            expect(result).to.be(null);
+            expect(result).to.be('');
 
             payment.session.get_payment(payment.account_id, payment.payment_id, function(error, result) {
               expect(error).to.be(null);

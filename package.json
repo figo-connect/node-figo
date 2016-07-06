@@ -6,7 +6,7 @@
   "license": "MIT",
   "main": "./lib/figo.js",
   "scripts": {
-    "test": "mocha --timeout 30000 test/*"
+    "test": "mocha --timeout 60000 test/*"
   },
   "repository": {
     "type": "git",
@@ -14,13 +14,15 @@
   },
   "devDependencies": {
     "chai": "",
-    "mocha": "",
-    "expect.js": ""
+    "expect.js": "",
+    "lodash": "^4.13.1",
+    "mocha": ""
   },
   "engines": {
     "node": ">=0.8.0"
   },
   "dependencies": {
-    "clone": "^1.0.2"
+    "clone": "^1.0.2",
+    "superagent": "^2.0.0"
   }
 }
