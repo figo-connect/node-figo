@@ -59,11 +59,11 @@ describe('Parallel query tests', function () {
   it("should list all transactions - using new session each iteration (in parallel)", function(done) {
     async.map(accounts,
       function(account, callback) {
-        new figo.Session(access_token).get_transactions({account_id: account.account_id}, function(error, transactions) {
+        return new figo.Session(access_token).get_transactions({account_id: account.account_id}, function(error, transactions) {
           if (error)
-            callback(error);
+            return callback(error);
           else
-            callback(null, transactions);
+            return callback(null, transactions);
         });
       },
       function(error, transactions) {
@@ -82,11 +82,11 @@ describe('Parallel query tests', function () {
     var session = new figo.Session(access_token);
     async.map(accounts,
       function(account, callback) {
-        session.get_transactions({account_id: account.account_id}, function(error, transactions) {
+        return session.get_transactions({account_id: account.account_id}, function(error, transactions) {
           if (error)
-            callback(error);
+            return callback(error);
           else
-            callback(null, transactions);
+            return callback(null, transactions);
         });
       },
       function(error, transactions) {
@@ -125,12 +125,12 @@ describe('Parallel query tests', function () {
     var session = new figo.Session(access_token);
     async.map(tasks,
       function(task, callback) {
-        session[task.task](null, function (error, response) {
+        return session[task.task](null, function (error, response) {
           expect(error).to.be.null;
           expect(response).to.be.instanceof(Array);
           expect(response[0]).to.contain.all.keys(task.expect);
           expect(response.length).to.be.above(0);
-          callback();
+          return callback();
         });
       },
       function() {
