@@ -102,7 +102,7 @@ describe('Parallel query tests', function () {
       });
   });
 
-  it("should list does misc tasks - reusing same session each iteration (in parallel)", function(done) {
+  it("should do misc tasks - reusing same session each iteration (in parallel)", function(done) {
     // since these tasks are repeated from test/figo.js, we only need brief assertions in the callbacks
     var tasks = [
       {
