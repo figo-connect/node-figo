@@ -14,8 +14,7 @@
   },
   "devDependencies": {
     "chai": "",
-    "mocha": "",
-    "expect.js": ""
+    "mocha": ""
   },
   "engines": {
     "node": ">=0.8.0"
