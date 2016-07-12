@@ -150,8 +150,8 @@ describe("The figo session", function() {
     new figo.Session(access_token).get_securities(null, function(error, securities) {
       expect(error).to.be.null;
       expect(securities).to.be.instanceof(Array);
-      expect(securities.length).to.be.above(-1);
-      if (securities.length) expect(securities[0]).to.contain.all.keys("security_id");
+      expect(securities.length).to.be.above(0);
+      expect(securities[0]).to.contain.all.keys("security_id");
       done();
     });
   });
@@ -160,8 +160,8 @@ describe("The figo session", function() {
     new figo.Session(access_token).get_payments(null, function(error, payments) {
       expect(error).to.be.null;
       expect(payments).to.be.instanceof(Array);
-      expect(payments.length).to.be.above(-1);
-      if (payments.length) expect(payments[0]).to.contain.all.keys("payment_id");
+      expect(payments.length).to.be.above(0);
+      expect(payments[0]).to.contain.all.keys("payment_id");
       done();
     });
   });

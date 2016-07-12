@@ -56,7 +56,7 @@ describe('Parallel query tests', function () {
     });
   });
 
-  it("should list all accounts (in parallel)", function(done) {
+  it("should list all transactions - using new session each iteration (in parallel)", function(done) {
     async.map(accounts,
       function(account, callback) {
         new figo.Session(access_token).get_transactions({account_id: account.account_id}, function(error, transactions) {
@@ -70,10 +70,74 @@ describe('Parallel query tests', function () {
         expect(error).to.be.null;
 
         var len = transactions.length;
-        for (var i=0; i<len; i++) {
+        for (var i=0; i<len; i++)
           parallelTransactions = parallelTransactions.concat(transactions[i]);
-        }
+
         expect(sequentialTransactions.length).to.equal(parallelTransactions.length);
+        done();
+      });
+  });
+
+  it("should list all transaction - reusing same session each iteration (in parallel)", function(done) {
+    var session = new figo.Session(access_token);
+    async.map(accounts,
+      function(account, callback) {
+        session.get_transactions({account_id: account.account_id}, function(error, transactions) {
+          if (error)
+            callback(error);
+          else
+            callback(null, transactions);
+        });
+      },
+      function(error, transactions) {
+        expect(error).to.be.null;
+
+        var len = transactions.length;
+        parallelTransactions = [];
+        for (var i=0; i<len; i++)
+          parallelTransactions = parallelTransactions.concat(transactions[i]);
+
+        expect(sequentialTransactions.length).to.equal(parallelTransactions.length);
+        done();
+      });
+  });
+
+  it("should list does misc tasks - reusing same session each iteration (in parallel)", function(done) {
+    // since these tasks are repeated from test/figo.js, we only need brief assertions in the callbacks
+    var tasks = [
+      {
+        task: "get_transactions",
+        hasFirstParam: true,
+        expect: "transaction_id",
+      },
+      {
+        task: "get_payments",
+        hasFirstParam: true,
+        expect: "payment_id",
+      },
+      {
+        task: "get_securities",
+        hasFirstParam: true,
+        expect: "security_id",
+      },
+      {
+        task: "get_standing_orders",
+        hasFirstParam: true,
+        expect: "standing_order_id",
+      },
+    ];
+    var session = new figo.Session(access_token);
+    async.map(tasks,
+      function(task, callback) {
+        session[task.task](null, function (error, response) {
+          expect(error).to.be.null;
+          expect(response).to.be.instanceof(Array);
+          expect(response[0]).to.contain.all.keys(task.expect);
+          expect(response.length).to.be.above(0);
+          callback();
+        });
+      },
+      function() {
         done();
       });
   });
