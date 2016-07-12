@@ -107,22 +107,18 @@ describe('Parallel query tests', function () {
     var tasks = [
       {
         task: "get_transactions",
-        hasFirstParam: true,
         expect: "transaction_id",
       },
       {
         task: "get_payments",
-        hasFirstParam: true,
         expect: "payment_id",
       },
       {
         task: "get_securities",
-        hasFirstParam: true,
         expect: "security_id",
       },
       {
         task: "get_standing_orders",
-        hasFirstParam: true,
         expect: "standing_order_id",
       },
     ];
