@@ -68,6 +68,8 @@ describe('Parallel query tests', function () {
         });
       },
       function(error, transactions) {
+        expect(error).to.be.null;
+        
         var len = transactions.length;
         for (var i=0; i<len; i++) {
           parallelTransactions = parallelTransactions.concat(transactions[i]);
