@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-//var expect = require("expect.js");
 var expect = require("chai").expect;
 var async = require("async");
 
@@ -33,8 +32,8 @@ var access_token = "ASHWLIkouP2O6_bgA2wWReRhletgWKHYjLqDaqb0LFfamim9RjexTo22ujRI
 
 describe('Parallel query tests', function () {
   var accounts,
-    sequentialTransactions = [],
-    parallelTransactions = [];
+      sequentialTransactions = [],
+      parallelTransactions = [];
 
   it("should list all accounts", function(done) {
     new figo.Session(access_token).get_accounts(function(error, accts) {
@@ -69,7 +68,7 @@ describe('Parallel query tests', function () {
       },
       function(error, transactions) {
         expect(error).to.be.null;
-        
+
         var len = transactions.length;
         for (var i=0; i<len; i++) {
           parallelTransactions = parallelTransactions.concat(transactions[i]);
