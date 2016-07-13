@@ -235,10 +235,6 @@ describe("The figo session", function() {
 
   it("should provide a sync URL", function(done) {
     new figo.Session(access_token).get_sync_url("qwe", "qew", function(error, sync_url) {
-      if (error) {
-        console.error(error)
-        return done(error)
-      }
       expect(error).to.be.null;
       expect(sync_url).to.be.an("string");
       expect(sync_url.length).to.be.above(0);
