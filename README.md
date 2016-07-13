@@ -234,7 +234,7 @@ Changelog and New Features
 ### 1.4.4
 
 - Minor [bugfix](https://github.com/figo-connect/node-figo/issues/24)
-- Code [Beautified](https://github.com/figo-connect/node-figo/issues/18)
+- Code [beautified](https://github.com/figo-connect/node-figo/issues/18)
 
 ### 1.4.3
 
