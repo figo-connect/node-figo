@@ -51,11 +51,11 @@ Usage
 Make a connection:
 
 ```javascript
-var figo = require("figo");
+var figo = require('figo');
 
 // Demo client
-var client_id     = "CygnIYss8101KTkm1d0WgO4gFn4yvwWESKWfrVhhTkvE"; // Demo client ID
-var client_secret = "STsRqwSvVuZNoeV-vAZvLf8Zc3-qETEX9xAeb15qz5Oc"; // Demo client secret
+var client_id     = 'CygnIYss8101KTkm1d0WgO4gFn4yvwWESKWfrVhhTkvE'; // Demo client ID
+var client_secret = 'STsRqwSvVuZNoeV-vAZvLf8Zc3-qETEX9xAeb15qz5Oc'; // Demo client secret
 
 var connection = new figo.Connection(client_id, client_secret);
 ```
@@ -65,10 +65,10 @@ And create the first figo user:
 
 ```javascript
 // User personal data
-var name            = "John Doe";
-var email           = "john.doe@example.com";
-var password        = "Swordfish";
-var language        = "en";
+var name            = 'John Doe';
+var email           = 'john.doe@example.com';
+var password        = 'Swordfish';
+var language        = 'en';
 
 connection.create_user(name, email, password, language, null, function(error, recovery_password) {
   if (error) {
@@ -87,7 +87,7 @@ From the figo Connect [API reference](http://docs.figo.io/#calling-the-figo-conn
 Log in to obtain such access token:
 
 ```javascript
-var access_token = "";
+var access_token = '';
 
 connection.credential_login(username, password, null, null, null, null, function(error, token) {
   if (error) {
