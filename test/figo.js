@@ -36,6 +36,16 @@ process.on('uncaughtException', function(err) {
   console.error('Caught exception: ' + err.stack);
 });
 
+// endpont configuration via command line arguments or environment variables
+if ((process.env.npm_config_hostname || process.env.FIGO_HOST) &&
+    (process.env.npm_config_fingerprints || process.env.FIGO_FINGERPRINTS)) {
+    var hostname = process.env.npm_config_hostname || process.env.FIGO_HOST;
+    var fingerprints = process.env.npm_config_fingerprints || process.env.FIGO_FINGERPRINTS;
+
+    figo.Config.api_endpoint = hostname;
+    figo.Config.valid_fingerprints = fingerprints.split(',');
+}
+
 describe("The figo session", function() {
   it("should list all accounts", function(done) {
     new figo.Session(access_token).get_accounts(function(error, accounts) {
