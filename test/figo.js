@@ -120,7 +120,7 @@ describe("The figo session", function() {
     });
   });
 
-  it("should list login settings for a bank or service", function(done) {
+  it("shouldn't list login settings for a bank or service", function(done) {
     new figo.Session(access_token).get_login_settings("de", "90090042", function(error, login_settings) {
         expect(error).to.be.instanceof(Object);
 
