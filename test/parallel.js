@@ -30,6 +30,16 @@ var client_id = "CaESKmC8MAhNpDe5rvmWnSkRE_7pkkVIIgMwclgzGcQY";
 var client_secret = "STdzfv0GXtEj_bwYn7AgCVszN1kKq5BdgEIKOM_fzybQ";
 var access_token = "ASHWLIkouP2O6_bgA2wWReRhletgWKHYjLqDaqb0LFfamim9RjexTo22ujRIP_cjLiRiSyQXyt2kM1eXU2XLFZQ0Hro15HikJQT_eNeT_9XQ";
 
+// endpont configuration via command line arguments or environment variables
+if ((process.env.npm_config_hostname || process.env.FIGO_HOST) &&
+    (process.env.npm_config_fingerprints || process.env.FIGO_FINGERPRINTS)) {
+    var hostname = process.env.npm_config_hostname || process.env.FIGO_HOST;
+    var fingerprints = process.env.npm_config_fingerprints || process.env.FIGO_FINGERPRINTS;
+
+    figo.Config.api_endpoint = hostname;
+    figo.Config.valid_fingerprints = fingerprints.split(',');
+}
+
 describe('Parallel query tests', function () {
   var accounts,
       sequentialTransactions = [],
@@ -73,6 +83,7 @@ describe('Parallel query tests', function () {
         for (var i=0; i<len; i++)
           parallelTransactions = parallelTransactions.concat(transactions[i]);
 
+        expect(sequentialTransactions.length).to.not.equal(0);
         expect(sequentialTransactions.length).to.equal(parallelTransactions.length);
         done();
       });
@@ -97,6 +108,7 @@ describe('Parallel query tests', function () {
         for (var i=0; i<len; i++)
           parallelTransactions = parallelTransactions.concat(transactions[i]);
 
+        expect(sequentialTransactions.length).to.not.equal(0);
         expect(sequentialTransactions.length).to.equal(parallelTransactions.length);
         done();
       });
