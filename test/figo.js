@@ -37,6 +37,7 @@ process.on('uncaughtException', function(err) {
 });
 
 describe("The figo session", function() {
+
   it("should list all accounts", function(done) {
     new figo.Session(access_token).get_accounts(function(error, accounts) {
       expect(error).to.be.null;
