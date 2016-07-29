@@ -231,6 +231,10 @@ figo Node.js SDK is released under the [MIT License](http://opensource.org/licen
 Changelog and New Features
 --------------------------
 
+### 1.5.0
+
+- Minor [feature](https://github.com/figo-connect/node-figo/issues/12)
+
 ### 1.4.4
 
 - Minor [bugfix](https://github.com/figo-connect/node-figo/issues/24)
