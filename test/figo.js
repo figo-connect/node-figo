@@ -38,9 +38,11 @@ process.on('uncaughtException', function(err) {
 
 // endpont configuration via command line arguments or environment variables
 if ((process.env.npm_config_hostname || process.env.FIGO_HOST) &&
-    (process.env.npm_config_fingerprints || process.env.FIGO_FINGERPRINTS)) {
+    (process.env.npm_config_fingerprints || process.env.FIGO_FINGERPRINTS) &&
+    (process.env.npm_config_access_token || process.env.ACCESS_TOKEN)) {
     var hostname = process.env.npm_config_hostname || process.env.FIGO_HOST;
     var fingerprints = process.env.npm_config_fingerprints || process.env.FIGO_FINGERPRINTS;
+    access_token = process.env.npm_config_access_token || process.env.ACCESS_TOKEN;
 
     figo.Config.api_endpoint = hostname;
     figo.Config.valid_fingerprints = fingerprints.split(',');
