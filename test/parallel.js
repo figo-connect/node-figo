@@ -37,8 +37,10 @@ var args;
 // endpont configuration via command line arguments or environment variables
 if ((args = helpers.getEndpointFromProcessArgs())) {
   access_token = args.access_token;
-  figo.Config.api_endpoint = args.host;
-  figo.Config.valid_fingerprints = args.fingerprints.split(',');
+  figo.setOptions({
+    host: args.host,
+    fingerprints: args.fingerprints.split(','),
+  });
 }
 
 describe('Parallel query tests', function () {
