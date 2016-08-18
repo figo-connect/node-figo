@@ -9,7 +9,7 @@ var _getFromProcessArgs = function (str) {
   return null;
 };
 
-var endpointWasSet = function () {
+var getEndpointFromProcessArgs = function () {
   var host         = process.env.HOST         || _getFromProcessArgs("--host=");
   var fingerprints = process.env.FINGERPRINTS || _getFromProcessArgs("--fingerprints=");
   var access_token = process.env.ACCESS_TOKEN || _getFromProcessArgs("--access_token=");
@@ -20,9 +20,9 @@ var endpointWasSet = function () {
       access_token: access_token,
     };
   }
-  return false;
+  return null;
 };
 
 module.exports = {
-  endpointWasSet: endpointWasSet,
+  getEndpointFromProcessArgs: getEndpointFromProcessArgs,
 };

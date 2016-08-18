@@ -35,7 +35,7 @@ var access_token = "ASHWLIkouP2O6_bgA2wWReRhletgWKHYjLqDaqb0LFfamim9RjexTo22ujRI
 var args;
 
 // endpont configuration via command line arguments or environment variables
-if ((args = helpers.endpointWasSet())) {
+if ((args = helpers.getEndpointFromProcessArgs())) {
   access_token = args.access_token;
   figo.Config.api_endpoint = args.host;
   figo.Config.valid_fingerprints = args.fingerprints.split(',');
