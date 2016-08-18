@@ -41,7 +41,7 @@ process.on('uncaughtException', function(err) {
 });
 
 // endpont configuration via command line arguments or environment variables
-if ((args = helpers.getEndpointFromProcessArgs())) {
+if (args = helpers.getEndpointFromProcessArgs()) {
   access_token = args.access_token;
   figo.setOptions({
     host: args.host,
@@ -342,4 +342,3 @@ describe("The figo session", function() {
     });
   });
 });
-
