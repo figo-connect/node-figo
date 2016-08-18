@@ -26,10 +26,14 @@ var expect  = require("chai").expect;
 var figo      = require("../lib/figo");
 var FigoError = require("../lib/errors").FigoError;
 
+// helper functions
+var helpers = require("./helpers");
+
 // Demo client
 var client_id = "CaESKmC8MAhNpDe5rvmWnSkRE_7pkkVIIgMwclgzGcQY";
 var client_secret = "STdzfv0GXtEj_bwYn7AgCVszN1kKq5BdgEIKOM_fzybQ";
 var access_token = "ASHWLIkouP2O6_bgA2wWReRhletgWKHYjLqDaqb0LFfamim9RjexTo22ujRIP_cjLiRiSyQXyt2kM1eXU2XLFZQ0Hro15HikJQT_eNeT_9XQ";
+var args;
 
 // enabling stack traces
 process.on('uncaughtException', function(err) {
@@ -37,15 +41,10 @@ process.on('uncaughtException', function(err) {
 });
 
 // endpont configuration via command line arguments or environment variables
-if ((process.env.npm_config_hostname || process.env.FIGO_HOST) &&
-    (process.env.npm_config_fingerprints || process.env.FIGO_FINGERPRINTS) &&
-    (process.env.npm_config_access_token || process.env.ACCESS_TOKEN)) {
-    var hostname = process.env.npm_config_hostname || process.env.FIGO_HOST;
-    var fingerprints = process.env.npm_config_fingerprints || process.env.FIGO_FINGERPRINTS;
-    access_token = process.env.npm_config_access_token || process.env.ACCESS_TOKEN;
-
-    figo.Config.api_endpoint = hostname;
-    figo.Config.valid_fingerprints = fingerprints.split(',');
+if ((args = helpers.endpointWasSet())) {
+    access_token = args.access_token;
+    figo.Config.api_endpoint = args.host;
+    figo.Config.valid_fingerprints = args.fingerprints.split(',');
 }
 
 describe("The figo session", function() {
