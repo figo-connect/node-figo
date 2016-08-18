@@ -1,17 +1,18 @@
 // retrieve string that matches regex
-var _contains = function (arr, str) {
+var _getFromProcessArgs = function (str) {
+  var arr = process.argv;
   for (var i = 0, len = arr.length; i < len; i++) {
     if (arr[i].match(RegExp(str))) {
       return arr[i].substr(arr[i].indexOf("=") + 1);
     }
   }
-  return false;
+  return null;
 };
 
 var endpointWasSet = function () {
-  var host         = process.env.HOST         || _contains(process.argv, "--host=");
-  var fingerprints = process.env.FINGERPRINTS || _contains(process.argv, "--fingerprints=");
-  var access_token = process.env.ACCESS_TOKEN || _contains(process.argv, "--access_token=");
+  var host         = process.env.HOST         || _getFromProcessArgs("--host=");
+  var fingerprints = process.env.FINGERPRINTS || _getFromProcessArgs("--fingerprints=");
+  var access_token = process.env.ACCESS_TOKEN || _getFromProcessArgs("--access_token=");
   if (host && fingerprints && access_token) {
     return {
       host: host,
