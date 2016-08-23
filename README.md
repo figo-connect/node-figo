@@ -231,6 +231,10 @@ figo Node.js SDK is released under the [MIT License](http://opensource.org/licen
 Changelog and New Features
 --------------------------
 
+### 1.5.1
+
+- Create a `.stack` property on `FigoError` object: https://github.com/figo-connect/node-figo/pull/27
+
 ### 1.5.0
 
 - Minor [feature](https://github.com/figo-connect/node-figo/issues/12)
