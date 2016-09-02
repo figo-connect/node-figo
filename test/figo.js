@@ -26,15 +26,29 @@ var expect  = require("chai").expect;
 var figo      = require("../lib/figo");
 var FigoError = require("../lib/errors").FigoError;
 
+// helper functions
+var helpers = require("./helpers");
+
 // Demo client
 var client_id = "CaESKmC8MAhNpDe5rvmWnSkRE_7pkkVIIgMwclgzGcQY";
 var client_secret = "STdzfv0GXtEj_bwYn7AgCVszN1kKq5BdgEIKOM_fzybQ";
 var access_token = "ASHWLIkouP2O6_bgA2wWReRhletgWKHYjLqDaqb0LFfamim9RjexTo22ujRIP_cjLiRiSyQXyt2kM1eXU2XLFZQ0Hro15HikJQT_eNeT_9XQ";
+var args;
 
 // enabling stack traces
 process.on('uncaughtException', function(err) {
   console.error('Caught exception: ' + err.stack);
 });
+
+// endpont configuration via command line arguments or environment variables
+args = helpers.getEndpointFromProcessArgs();
+if (args) {
+  access_token = args.access_token;
+  figo.setOptions({
+    host: args.host,
+    fingerprints: args.fingerprints.split(','),
+  });
+}
 
 describe("The figo session", function() {
 
@@ -111,7 +125,7 @@ describe("The figo session", function() {
     });
   });
 
-  it("should list login settings for a bank or service", function(done) {
+  it("shouldn't list login settings for a bank or service", function(done) {
     new figo.Session(access_token).get_login_settings("de", "90090042", function(error, login_settings) {
         expect(error).to.be.instanceof(Object);
 
@@ -330,4 +344,3 @@ describe("The figo session", function() {
     });
   });
 });
-

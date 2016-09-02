@@ -25,10 +25,24 @@ var async = require("async");
 
 var figo = require("../lib/figo");
 
+// helper functions
+var helpers = require("./helpers");
+
 // Demo client
 var client_id = "CaESKmC8MAhNpDe5rvmWnSkRE_7pkkVIIgMwclgzGcQY";
 var client_secret = "STdzfv0GXtEj_bwYn7AgCVszN1kKq5BdgEIKOM_fzybQ";
 var access_token = "ASHWLIkouP2O6_bgA2wWReRhletgWKHYjLqDaqb0LFfamim9RjexTo22ujRIP_cjLiRiSyQXyt2kM1eXU2XLFZQ0Hro15HikJQT_eNeT_9XQ";
+var args;
+
+// endpont configuration via command line arguments or environment variables
+args = helpers.getEndpointFromProcessArgs();
+if (args) {
+  access_token = args.access_token;
+  figo.setOptions({
+    host: args.host,
+    fingerprints: args.fingerprints.split(','),
+  });
+}
 
 describe('Parallel query tests', function () {
   var accounts,
@@ -73,6 +87,7 @@ describe('Parallel query tests', function () {
         for (var i=0; i<len; i++)
           parallelTransactions = parallelTransactions.concat(transactions[i]);
 
+        expect(sequentialTransactions.length).to.not.equal(0);
         expect(sequentialTransactions.length).to.equal(parallelTransactions.length);
         done();
       });
@@ -97,6 +112,7 @@ describe('Parallel query tests', function () {
         for (var i=0; i<len; i++)
           parallelTransactions = parallelTransactions.concat(transactions[i]);
 
+        expect(sequentialTransactions.length).to.not.equal(0);
         expect(sequentialTransactions.length).to.equal(parallelTransactions.length);
         done();
       });
