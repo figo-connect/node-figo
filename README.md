@@ -233,6 +233,11 @@ figo Node.js SDK is released under the [MIT License](http://opensource.org/licen
 Changelog and New Features
 --------------------------
 
+### 1.6.0
+
+- Use SHA-256 to validate certificate fingerprint (5496e58)
+- Deprecate support of Node.js version below 0.11 (afeb565)
+
 ### 1.5.1
 
 - Create a `.stack` property on `FigoError` object: https://github.com/figo-connect/node-figo/pull/27
