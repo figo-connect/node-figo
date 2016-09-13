@@ -235,8 +235,8 @@ Changelog and New Features
 
 ### 1.6.0
 
-- Use SHA-256 to validate certificate fingerprint (https://github.com/figo-connect/node-figo/commit/5496e5823432b0751bd724f27afffc91370f1f65)
-- Deprecate support of Node.js version below 0.11 (https://github.com/figo-connect/node-figo/commit/afeb5658f5249aff57e7733309358e8711dfdf1a)
+- Use SHA-256 to validate certificate fingerprint ([`5496e58`](https://github.com/figo-connect/node-figo/commit/5496e5823432b0751bd724f27afffc91370f1f65g))
+- Deprecate support of Node.js version below 0.11 ([`afeb565`](https://github.com/figo-connect/node-figo/commit/afeb5658f5249aff57e7733309358e8711dfdf1a))
 
 ### 1.5.1
 
