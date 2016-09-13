@@ -13,11 +13,12 @@
     "url": "https://github.com/figo-connect/node-figo.git"
   },
   "devDependencies": {
+    "async": "^2.0.1",
     "chai": "",
     "mocha": ""
   },
   "engines": {
-    "node": ">=0.8.0"
+    "node": ">=0.11.0"
   },
   "dependencies": {
     "clone": "^1.0.2"
