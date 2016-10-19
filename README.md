@@ -56,8 +56,8 @@ Make a connection:
 var figo = require('figo');
 
 // Demo client
-var client_id     = 'CygnIYss8101KTkm1d0WgO4gFn4yvwWESKWfrVhhTkvE'; // Demo client ID
-var client_secret = 'STsRqwSvVuZNoeV-vAZvLf8Zc3-qETEX9xAeb15qz5Oc'; // Demo client secret
+var client_id     = 'CaESKmC8MAhNpDe5rvmWnSkRE_7pkkVIIgMwclgzGcQY'; // Demo client ID
+var client_secret = 'STdzfv0GXtEj_bwYn7AgCVszN1kKq5BdgEIKOM_fzybQ'; // Demo client secret
 
 var connection = new figo.Connection(client_id, client_secret);
 ```
