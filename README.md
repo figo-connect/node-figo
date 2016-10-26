@@ -16,7 +16,7 @@ For more information please check [our website](http://figo.io).
 
 ### Get an API key
 
-To get started with figo Connect you have to register your application first. Request your personal credentials using our online [application form](http://figo.io/api_key.html) or just [email us](mailto:business@figo.io) and we will be more than happy to provide you with a client ID and a secret without any bureaucracy.
+To get started with figo Connect you have to register your application first. Request your personal credentials using our online [application form](https://www.figo.io/client-id/) or just [email us](mailto:business@figo.io) and we will be more than happy to provide you with a client ID and a secret without any bureaucracy.
 
 The Latest Version
 ------------------
