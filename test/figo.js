@@ -63,7 +63,7 @@ describe("The figo session", function() {
     });
   });
 
-  it("shouldn't list all supported banks, credit cards, other payment services", function(done) {
+  it.skip("shouldn't list all supported banks, credit cards, other payment services", function(done) {
     new figo.Session(access_token).get_supported_payment_services("de", null, function(error, services) {
         expect(error).to.be.instanceof(Object);
 
@@ -330,4 +330,3 @@ describe("The figo session", function() {
     });
   });
 });
-
