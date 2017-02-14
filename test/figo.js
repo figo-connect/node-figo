@@ -65,16 +65,8 @@ describe("The figo session", function() {
 
   it.skip("shouldn't list all supported banks, credit cards, other payment services", function(done) {
     new figo.Session(access_token).get_supported_payment_services("de", null, function(error, services) {
-        expect(error).to.be.instanceof(Object);
-
-        expect(error).to.be.instanceof(Error);
-        expect(error).to.be.instanceof(FigoError);
-
-        expect(error).to.have.property("stack");
-        var stackTraceIsProper = error.stack.indexOf('/lib/figo.js:') !== -1;
-        expect(stackTraceIsProper).to.be.true;
-
-        expect(services).to.be.undefined;
+        expect(error).to.be.null;
+        expect(services).to.be.null;
         done();
     });
   });
