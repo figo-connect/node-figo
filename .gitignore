@@ -1,3 +1,6 @@
+# Credentials
+.coveralls.yml
+
 # Dependencies
 /node_modules/
 /web_demo/node_modules/
@@ -11,6 +14,7 @@ npm-debug.log
 *.log
 
 # Misc
+coverage/
 results
 lib-cov
 *.seed
