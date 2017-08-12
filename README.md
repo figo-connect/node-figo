@@ -4,6 +4,7 @@ figo Node.js SDK
 [![npm version](http://img.shields.io/npm/v/figo.svg)](https://www.npmjs.org/package/figo)
 [![Build Status](https://secure.travis-ci.org/figo-connect/node-figo.svg)](https://travis-ci.org/figo-connect/node-figo)
 [![dependencies Status](https://david-dm.org/figo-connect/node-figo/status.svg)](https://david-dm.org/figo-connect/node-figo)
+[![Coverage Status](https://coveralls.io/repos/github/figo-connect/node-figo/badge.svg)](https://coveralls.io/github/figo-connect/node-figo)
 
 figo Node.js SDK is a package that contains a set of wrappers for figo Connect API and enables you to start creating applications in a Node.js environment immediately.
 
