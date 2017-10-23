@@ -83,7 +83,6 @@ describe("Tests", function() {
         expect(data).to.be.instanceof(Object)
         expect(data.is_ended).to.be.true;
         expect(data.is_erroneous).to.be.false;
-        account_id = data.account_id;
         done();
       });
     });
@@ -94,6 +93,34 @@ describe("Tests", function() {
       expect(error).to.be.null;
       expect(accounts).to.be.instanceof(Array);
       expect(accounts).to.have.length(3);
+      account_id = accounts[0].account_id;
+      done();
+    });
+  });
+
+  it("should list all supported banks", function(done) {
+    new figo.Session(access_token).get_supported_payment_services("de", "banks", function(error, services) {
+      expect(error).to.be.null;
+      expect(services).to.be.instanceof(Object)
+      expect(services.banks.length).to.be.above(0);
+      done();
+    });
+  });
+
+  it("should list all supported services", function(done) {
+    new figo.Session(access_token).get_supported_payment_services("de", "services", function(error, services) {
+      expect(error).to.be.null;
+      expect(services).to.be.instanceof(Object)
+      expect(services.services.length).to.be.above(0);
+      done();
+    });
+  });
+
+  it("should list login settings for a bank or service", function(done) {
+    new figo.Session(access_token).get_login_settings("de", "90090042", function(error, login_settings) {
+      expect(error).to.be.null;
+      expect(login_settings.auth_type).to.be.equal("pin");
+      expect(login_settings.bank_name).to.be.equal("Demobank");
       done();
     });
   });
@@ -152,7 +179,6 @@ describe("Tests", function() {
       done();
     });
   });
-
 
   it("should provide access to the current user", function(done) {
     new figo.Session(access_token).get_user(function(error, user) {
@@ -228,7 +254,6 @@ describe("Tests", function() {
     });
   });
 
-  /*
   it("should allow management of a payment", function(done) {
     var session = new figo.Session(access_token);
     session.add_payment(new figo.Payment(session, {
@@ -273,7 +298,7 @@ describe("Tests", function() {
         });
       });
     });
-  });*/
+  });
 
   it("should delete user", function(done) {
     new figo.Session(access_token).remove_user(function(error) {
