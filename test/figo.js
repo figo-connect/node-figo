@@ -26,7 +26,7 @@ var expect  = require("chai").expect;
 var figo      = require("../lib/figo");
 var FigoError = require("../lib/errors").FigoError;
 
-figo.Config.api_endpoint = process.env.FIGO_API_ENDPOINT || 'api.figo.me'
+figo.Config.api_endpoint = process.env.FIGO_API_ENDPOINT || 'staging.figo.me'
 if (process.env.FIGO_API_FINGERPRINT) {
   figo.Config.valid_fingerprints.push(process.env.FIGO_API_FINGERPRINT);
 }
