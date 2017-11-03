@@ -26,104 +26,102 @@ var expect  = require("chai").expect;
 var figo      = require("../lib/figo");
 var FigoError = require("../lib/errors").FigoError;
 
-// Demo client
-var client_id = "CaESKmC8MAhNpDe5rvmWnSkRE_7pkkVIIgMwclgzGcQY";
-var client_secret = "STdzfv0GXtEj_bwYn7AgCVszN1kKq5BdgEIKOM_fzybQ";
-var access_token = "ASHWLIkouP2O6_bgA2wWReRhletgWKHYjLqDaqb0LFfamim9RjexTo22ujRIP_cjLiRiSyQXyt2kM1eXU2XLFZQ0Hro15HikJQT_eNeT_9XQ";
+figo.Config.api_endpoint = process.env.FIGO_API_ENDPOINT || 'staging.figo.me'
+if (process.env.FIGO_API_FINGERPRINT) {
+  figo.Config.valid_fingerprints.push(process.env.FIGO_API_FINGERPRINT);
+}
+
+var connection = new figo.Connection(process.env.FIGO_CLIENT_ID, process.env.FIGO_CLIENT_SECRET)
+var email = Math.random().toString(36).substring(7) + "@example.com";
+var password = Math.random().toString(36).substring(7);
+var access_token = '';
+var task = '';
+var account_id = '';
+
+
+function sleep (time) {
+  return new Promise((resolve) => setTimeout(resolve, time));
+}
+
 
 // enabling stack traces
 process.on('uncaughtException', function(err) {
   console.error('Caught exception: ' + err.stack);
 });
 
-describe("The figo session", function() {
+
+describe("Tests", function() {
+  it("should create a new user", function(done) {
+    connection.create_user('JS SDK Test', email, password, 'de', null, function(error, recovery_password) {
+      expect(error).to.be.null;
+      expect(recovery_password).to.be.instanceof(Object);
+      done();
+    });
+  });
+
+  it("should get an accesstoken", function(done) {
+    connection.credential_login(email, password, null, null, null, null, function(error, token) {
+      expect(error).to.be.null;
+      expect(token).to.be.instanceof(Object);
+      access_token = token.access_token;
+      done();
+    });
+  });
+
+  it("should add account", function(done) {
+    new figo.Session(access_token).add_account("de", ["figo", "figo"], "90090042", null, null, function(error, token) {
+      expect(error).to.be.null;
+      expect(token).to.be.instanceof(Object);
+      task = token;
+      done();
+    });
+  });
+
+  it("should finish synchronization", function(done) {
+    sleep(10000).then(function() {
+      new figo.Session(access_token).get_task_state(task, null, function(error, data) {
+        expect(data).to.be.instanceof(Object)
+        expect(data.is_ended).to.be.true;
+        expect(data.is_erroneous).to.be.false;
+        done();
+      });
+    });
+  });
 
   it("should list all accounts", function(done) {
     new figo.Session(access_token).get_accounts(function(error, accounts) {
       expect(error).to.be.null;
       expect(accounts).to.be.instanceof(Array);
       expect(accounts).to.have.length(3);
+      account_id = accounts[0].account_id;
       done();
     });
   });
 
-  it("shouldn't allow to add an account", function(done) {
-    new figo.Session(access_token).add_account("de", ["figo", "figo"], "90090042", null, null, function(error, task_token) {
-      expect(error).to.be.instanceof(Object);
-
-      expect(error).to.be.instanceof(Error);
-      expect(error).to.be.instanceof(FigoError);
-
-      expect(error).to.have.property("stack");
-      var stackTraceIsProper = error.stack.indexOf('/lib/figo.js:') !== -1;
-      expect(stackTraceIsProper).to.be.true;
-
-      expect(task_token).to.be.undefined;
-      done();
-    });
-  });
-
-  it.skip("shouldn't list all supported banks, credit cards, other payment services", function(done) {
-    new figo.Session(access_token).get_supported_payment_services("de", null, function(error, services) {
-        expect(error).to.be.instanceof(Object);
-
-        expect(error).to.be.instanceof(Error);
-        expect(error).to.be.instanceof(FigoError);
-
-        expect(error).to.have.property("stack");
-        var stackTraceIsProper = error.stack.indexOf('/lib/figo.js:') !== -1;
-        expect(stackTraceIsProper).to.be.true;
-
-        expect(services).to.be.undefined;
-        done();
-    });
-  });
-
-  it("shouldn't list all supported credit cards and other payment services", function(done) {
-    new figo.Session(access_token).get_supported_payment_services("de", "services", function(error, services) {
-        expect(error).to.be.instanceof(Object);
-
-        expect(error).to.be.instanceof(Error);
-        expect(error).to.be.instanceof(FigoError);
-
-        expect(error).to.have.property("stack");
-        var stackTraceIsProper = error.stack.indexOf('/lib/figo.js:') !== -1;
-        expect(stackTraceIsProper).to.be.true;
-
-        expect(services).to.be.undefined;
-        done();
-    });
-  });
-
-  it("shouldn't list all supported banks", function(done) {
+  it("should list all supported banks", function(done) {
     new figo.Session(access_token).get_supported_payment_services("de", "banks", function(error, services) {
-        expect(error).to.be.instanceof(Object);
+      expect(error).to.be.null;
+      expect(services).to.be.instanceof(Object)
+      expect(services.banks.length).to.be.above(0);
+      done();
+    });
+  });
 
-        expect(error).to.be.instanceof(Error);
-        expect(error).to.be.instanceof(FigoError);
-
-        expect(error).to.have.property("stack");
-        var stackTraceIsProper = error.stack.indexOf('/lib/figo.js:') !== -1;
-        expect(stackTraceIsProper).to.be.true;
-
-        expect(services).to.be.undefined;
-        done();
+  it("should list all supported services", function(done) {
+    new figo.Session(access_token).get_supported_payment_services("de", "services", function(error, services) {
+      expect(error).to.be.null;
+      expect(services).to.be.instanceof(Object)
+      expect(services.services.length).to.be.above(0);
+      done();
     });
   });
 
   it("should list login settings for a bank or service", function(done) {
     new figo.Session(access_token).get_login_settings("de", "90090042", function(error, login_settings) {
-        expect(error).to.be.instanceof(Object);
-
-        expect(error).to.be.instanceof(Error);
-        expect(error).to.be.instanceof(FigoError);
-
-        expect(error).to.have.property("stack");
-        var stackTraceIsProper = error.stack.indexOf('/lib/figo.js:') !== -1;
-        expect(stackTraceIsProper).to.be.true;
-
-        expect(login_settings).to.be.undefined;
-        done();
+      expect(error).to.be.null;
+      expect(login_settings.auth_type).to.be.equal("pin");
+      expect(login_settings.bank_name).to.be.equal("Demobank");
+      done();
     });
   });
 
@@ -141,8 +139,7 @@ describe("The figo session", function() {
     new figo.Session(access_token).get_standing_orders(null, function(error, standing_orders) {
       expect(error).to.be.null;
       expect(standing_orders).to.be.instanceof(Array);
-      expect(standing_orders.length).to.be.above(0);
-      expect(standing_orders[0]).to.contain.all.keys("standing_order_id");
+      expect(standing_orders.length).to.be.above(-1);
       done();
     });
   });
@@ -161,8 +158,7 @@ describe("The figo session", function() {
     new figo.Session(access_token).get_payments(null, function(error, payments) {
       expect(error).to.be.null;
       expect(payments).to.be.instanceof(Array);
-      expect(payments.length).to.be.above(0);
-      expect(payments[0]).to.contain.all.keys("payment_id");
+      expect(payments.length).to.be.above(-1);
       done();
     });
   });
@@ -184,36 +180,20 @@ describe("The figo session", function() {
     });
   });
 
-  it("should cope with errors", function(done) {
-    new figo.Session(access_token).get_sync_url("https://example.com", "", function(error, result) {
-      expect(error).to.be.instanceof(Object);
-
-      expect(error).to.be.instanceof(Error);
-      expect(error).to.be.instanceof(FigoError);
-
-      expect(error).to.have.property("stack");
-      var stackTraceIsProper = error.stack.indexOf('/lib/figo.js:') !== -1;
-      expect(stackTraceIsProper).to.be.true;
-
-      expect(result).to.be.undefined;
-      done();
-    });
-  });
-
   it("should provide access to the current user", function(done) {
     new figo.Session(access_token).get_user(function(error, user) {
       expect(error).to.be.null;
       expect(user).to.be.instanceof(Object);
-      expect(user.email).to.equal("demo@figo.me");
+      expect(user.email).to.equal(email);
       done();
     });
   });
 
-  it("should retrieve account A1.1", function(done) {
-    new figo.Session(access_token).get_account("A1.1", function(error, account) {
+  it("should retrieve account", function(done) {
+    new figo.Session(access_token).get_account(account_id, function(error, account) {
       expect(error).to.be.null;
       expect(account).to.be.instanceof(Object);
-      expect(account.account_id).to.equal("A1.1");
+      expect(account.account_id).to.equal(account_id);
 
       expect(account.balance).to.be.instanceof(Object);
       expect(account.balance.balance).to.be.a("number");
@@ -222,7 +202,7 @@ describe("The figo session", function() {
       account.get_transactions(null, function(error, transactions) {
         expect(error).to.be.null;
         expect(transactions).to.be.instanceof(Array);
-        expect(transactions.length).to.be.above(0);
+        expect(transactions.length).to.be.above(-1);
 
         account.get_payments(function(error, payments) {
           expect(error).to.be.null;
@@ -231,15 +211,6 @@ describe("The figo session", function() {
           done();
         });
       });
-    });
-  });
-
-  it("should provide a sync URL", function(done) {
-    new figo.Session(access_token).get_sync_url("qwe", "qew", function(error, sync_url) {
-      expect(error).to.be.null;
-      expect(sync_url).to.be.an("string");
-      expect(sync_url.length).to.be.above(0);
-      done();
     });
   });
 
@@ -286,24 +257,23 @@ describe("The figo session", function() {
   it("should allow management of a payment", function(done) {
     var session = new figo.Session(access_token);
     session.add_payment(new figo.Payment(session, {
-      account_id: "A1.1",
+      account_id: account_id,
       type: "Transfer",
       account_number: "4711951501",
       bank_code: "90090042",
       name: "Mönckebergstraße",
       purpose: "Приятных покупок!",
-      amount: 0.89000000000000001
+      amount: 0.89
     }), function(error, payment) {
       expect(error).to.be.null;
       expect(payment).to.be.instanceof(Object);
-      expect(payment.account_id).to.equal("A1.1");
+      expect(payment.account_id).to.equal(account_id);
       expect(payment.bank_name).to.equal("Demobank");
       expect(payment.amount).to.equal(0.89);
-
       payment.session.get_payment(payment.account_id, payment.payment_id, function(error, payment) {
         expect(error).to.be.null;
         expect(payment).to.be.instanceof(Object);
-        expect(payment.account_id).to.equal("A1.1");
+        expect(payment.account_id).to.equal(account_id);
         expect(payment.bank_name).to.equal("Demobank");
         expect(payment.amount).to.equal(0.89);
 
@@ -311,7 +281,7 @@ describe("The figo session", function() {
         payment.session.modify_payment(payment, function(error, payment) {
           expect(error).to.be.null;
           expect(payment).to.be.instanceof(Object);
-          expect(payment.account_id).to.equal("A1.1");
+          expect(payment.account_id).to.equal(account_id);
           expect(payment.bank_name).to.equal("Demobank");
           expect(payment.amount).to.equal(2.39);
 
@@ -327,6 +297,13 @@ describe("The figo session", function() {
           });
         });
       });
+    });
+  });
+
+  it("should delete user", function(done) {
+    new figo.Session(access_token).remove_user(function(error) {
+      expect(error).to.be.null;
+      done();
     });
   });
 });

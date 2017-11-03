@@ -219,11 +219,16 @@ Make sure you have all the necessary dependencies:
 npm install
 ```
 
-And then run the unit tests:
+You need to set the following environment variables:
+  - `FIGO_CLIENT_ID`
+  - `FIGO_CLIENT_SECRET`
+  - `FIGO_API_FINGERPRINT`
+  - `FIGO_API_ENDPOINT` (optional, defaults to `staging.figo.me`)
 
 ```bash
 npm test
 ```
+
 
 License
 -------
