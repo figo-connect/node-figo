@@ -20,26 +20,32 @@
 // THE SOFTWARE.
 //
 
-var expect  = require("chai").expect;
+const expect  = require("chai").expect;
 
 // figo sdk
-var figo      = require("../lib/figo");
-var FigoError = require("../lib/errors").FigoError;
+const figo      = require("../lib/figo");
+const FigoError = require("../lib/errors").FigoError;
 
-figo.Config.api_endpoint = process.env.FIGO_API_ENDPOINT || 'staging.figo.me'
-if (process.env.FIGO_API_FINGERPRINT) {
-  figo.Config.valid_fingerprints.push(process.env.FIGO_API_FINGERPRINT);
+
+const config = {
+  api_endpoint: process.env.FIGO_API_ENDPOINT || 'https://staging.figo.me/v3'
 }
 
-var connection = new figo.Connection(process.env.FIGO_CLIENT_ID, process.env.FIGO_CLIENT_SECRET)
-var email = Math.random().toString(36).substring(7) + "@example.com";
-var password = Math.random().toString(36).substring(7);
+if (process.env.FIGO_API_FINGERPRINT) {
+  config.valid_fingerprints = [process.env.FIGO_API_FINGERPRINT];
+}
+
+figo.setConfig(config);
+
+const connection = new figo.Connection(process.env.FIGO_CLIENT_ID, process.env.FIGO_CLIENT_SECRET)
+const email = Math.random().toString(36).substring(7) + "@example.com";
+const password = Math.random().toString(36).substring(7);
 var access_token = '';
 var task = '';
 var account_id = '';
 
 
-function sleep (time) {
+const sleep = function(time) {
   return new Promise((resolve) => setTimeout(resolve, time));
 }
 
