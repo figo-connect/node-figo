@@ -8,9 +8,3 @@ install:
 - npm install
 script:
 - npm test
-env:
-  global:
-  - FIGO_API_FINGERPRINT=d0039ef08fbd48678671ce9da554248163d7d94dedf16a55f052c70aab7bb89d
-  - FIGO_API_ENDPOINT=staging.figo.me
-  - secure: H1/qb3ClaQNzmj1nuDgXWv1+4T1e+VIM09P0ErBdE3CWlzz3w1uCGIWQZFVcuIkDQdDv0gUYBGW7pLote4BgjE0Qx3RSUmsqZTLYzbaIfYo97QgtDRYqj2FrpfENR1ydOIMDsAO1hVxB8rkeuX4cZWQCa2ykjK5mGqCwPAj0LWs=
-  - secure: dUg/AGsFChtVXFx98i/FWs0IWAUpzoin853I6RHUGW5x/FIYGA8Bxj589sBpZ8i42V9F7agPKwHyhjIztm9an5W9cSHnwaGfzLpcfAPZnF3yjQRJy5qoYrxnmC5EdBqiZoCOcqpBts9uYnGexohXBbooEDAc1/yp9wigNEAF2y0=
