@@ -220,6 +220,16 @@ describe("Tests", function() {
     });
   });
 
+  it("should show bank details", function(done) {
+    var session = new figo.Session(access_token)
+    session.get_account(account_id, function(error, account){
+      session.get_bank(account.bank_id, function(error, bank) {
+        expect(bank).to.be.not.null;
+        done();
+      })
+    })
+  });
+
   it("should allow management of a notification", function(done) {
     var session = new figo.Session(access_token);
     session.add_notification(new figo.Notification(session, {observe_key: "/rest/transactions", notify_uri: "http://figo.me/test", state: "qwe"}), function(error, notification) {
@@ -312,4 +322,7 @@ describe("Tests", function() {
       done();
     });
   });
+
+
 });
+
