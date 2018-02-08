@@ -74,6 +74,15 @@ describe("Tests", function() {
     });
   });
 
+  it("should get not an accesstoken for invalid credentials", function(done) {
+    connection.credential_login("foo@example.com", "bar", null, null, null, null, function(error, token) {
+      expect(error).to.be.not.null;
+      expect(error.description).to.be.not.null;
+      expect(token).to.be.not.instanceof(Object);
+      done();
+    });
+  });
+
   it("should add account", function(done) {
     new figo.Session(access_token).add_account("de", ["figo", "figo"], "90090042", null, null, function(error, token) {
       expect(error).to.be.null;
