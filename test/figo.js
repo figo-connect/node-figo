@@ -74,6 +74,15 @@ describe("Tests", function() {
     });
   });
 
+  it("should get not an accesstoken for invalid credentials", function(done) {
+    connection.credential_login("foo@example.com", "bar", null, null, null, null, function(error, token) {
+      expect(error).to.be.not.null;
+      expect(error.description).to.be.not.null;
+      expect(token).to.be.not.instanceof(Object);
+      done();
+    });
+  });
+
   it("should add account", function(done) {
     new figo.Session(access_token).add_account("de", ["figo", "figo"], "90090042", null, null, function(error, token) {
       expect(error).to.be.null;
@@ -220,6 +229,16 @@ describe("Tests", function() {
     });
   });
 
+  it("should show bank details", function(done) {
+    var session = new figo.Session(access_token)
+    session.get_account(account_id, function(error, account){
+      session.get_bank(account.bank_id, function(error, bank) {
+        expect(bank).to.be.not.null;
+        done();
+      })
+    })
+  });
+
   it("should allow management of a notification", function(done) {
     var session = new figo.Session(access_token);
     session.add_notification(new figo.Notification(session, {observe_key: "/rest/transactions", notify_uri: "http://figo.me/test", state: "qwe"}), function(error, notification) {
@@ -312,4 +331,7 @@ describe("Tests", function() {
       done();
     });
   });
+
+
 });
+

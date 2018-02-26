@@ -26,7 +26,7 @@ The latest version of this SDK can be found in [GitHub repository](https://githu
 Documentation
 -------------
 
-Detailed API reference is available [online](http://docs.figo.io) on our website.
+Detailed API reference is available [online](http://docs.figo.io/v3/) on our website.
 
 Installation
 ------------
@@ -83,7 +83,7 @@ connection.create_user(name, email, password, language, null, function(error, re
 
 ### Authentication
 
-From the figo Connect [API reference](http://docs.figo.io/#calling-the-figo-connect-api):
+From the figo Connect [API reference](http://docs.figo.io/v3/#calling-the-figo-connect-api):
 > “In order to access any information belonging to a user, a client has to authenticate with a token linking itself to the user. This token is called an *access token* and contains information on the client, the user and the level of access the client has to the users data.”
 
 Log in to obtain such access token:
@@ -206,7 +206,7 @@ figo Connect API allows you not only to get an information related to bank accou
 
 1. First, you have to compile a payment object and submit it to the figo Connect API.
 2. Second, you need to submit the newly created payment to the bank itself via the figo Connect API.
-Although any interaction with the API is done live, customer bank's servers might take some time to reply. In order to handle this figo Connect API will create a [background task](http://docs.figo.io/#task-processing) and will return a task token to your application on step two. Using this task token you can later poll the result of the task execution.
+Although any interaction with the API is done live, customer bank's servers might take some time to reply. In order to handle this figo Connect API will create a [background task](http://docs.figo.io/v3/#task-processing) and will return a task token to your application on step two. Using this task token you can later poll the result of the task execution.
 
 Tests
 -----

@@ -1,8 +1,8 @@
 {
   "name": "figo",
   "description": "API wrapper for figo Connect.",
-  "version": "1.7.1",
-  "author": "Max Filenko <mfilenko@figo.io>",
+  "version": "3.0.0",
+  "author": "figo <dev@figo.io>",
   "license": "MIT",
   "main": "./lib/figo.js",
   "scripts": {
