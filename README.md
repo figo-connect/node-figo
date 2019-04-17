@@ -237,6 +237,11 @@ figo Node.js SDK is released under the [MIT License](http://opensource.org/licen
 Changelog and New Features
 --------------------------
 
+### 3.1.1
+
+- Dropped support for node.js 4.0
+- removed cert-pinning to support new figo infrastructure
+
 ### 1.6.0
 
 - Use SHA-256 to validate certificate fingerprint ([`5496e58`](https://github.com/figo-connect/node-figo/commit/5496e5823432b0751bd724f27afffc91370f1f65))
