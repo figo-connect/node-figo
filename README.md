@@ -222,7 +222,6 @@ npm install
 You need to set the following environment variables:
   - `FIGO_CLIENT_ID`
   - `FIGO_CLIENT_SECRET`
-  - `FIGO_API_FINGERPRINT`
   - `FIGO_API_ENDPOINT` (optional, defaults to `https://staging.figo.me/v3`)
 
 ```bash
