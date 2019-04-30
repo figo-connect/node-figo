@@ -237,6 +237,14 @@ figo Node.js SDK is released under the [MIT License](http://opensource.org/licen
 Changelog and New Features
 --------------------------
 
+### 3.1.3
+
+- rolled back to Winston 2.4.4 for compatibility
+
+### 3.1.2
+
+- updated dependencies to current stable versions
+
 ### 3.1.1
 
 - Dropped support for node.js 4.0
