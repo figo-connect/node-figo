@@ -1,7 +1,7 @@
 {
   "name": "figo",
   "description": "API wrapper for figo Connect.",
-  "version": "3.1.2",
+  "version": "3.1.3",
   "author": "figo <dev@figo.io>",
   "license": "MIT",
   "main": "./lib/figo.js",
@@ -22,6 +22,6 @@
   },
   "dependencies": {
     "clone": "^2.1.2",
-    "winston": "^3.2.1"
+    "winston": "^2.4.4"
   }
 }
