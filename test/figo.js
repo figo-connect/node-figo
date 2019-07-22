@@ -42,7 +42,8 @@ const email = Math.random().toString(36).substring(7) + "@example.com";
 const password = Math.random().toString(36).substring(7);
 var access_token = '';
 var task = '';
-var account_id = '';
+var access_id = '';
+var sync_id = '';
 
 
 const sleep = function(time) {
@@ -107,7 +108,7 @@ describe("Tests", function() {
       expect(access.credentials).to.include(result.credentials);
       expect(access.save_credentials).to.be.equal(result.save_credentials);
       expect(access.consent).to.deep.include(result.consent);
-      account_id = access.id;
+      access_id = access.id;
       done();
     });
   });
@@ -121,9 +122,27 @@ describe("Tests", function() {
   });
 
   it("should get an access", function(done) {
-    new figo.Session(access_token).get_access(account_id, function(error, access) {
+    new figo.Session(access_token).get_access(access_id, function(error, access) {
       expect(error).to.be.null;
       expect(access).to.be.instanceof(Object);
+      done();
+    });
+  });
+
+  it("should start a provider synchronization", function(done) {
+    new figo.Session(access_token).add_sync(access_id, function(error, sync) {
+      sync_id = sync.id
+      expect(error).to.be.null;
+      expect(sync).to.be.instanceof(Object);
+      expect(sync).to.have.keys('session', 'id', 'status', 'challenge', 'error', 'created_at', 'started_at', 'ended_at');
+      done();
+    });
+  });
+
+  it("should get a provider synchronization", function(done) {
+    new figo.Session(access_token).get_sync(access_id, sync_id, function(error, sync) {
+      expect(error).to.be.null;
+      expect(sync).to.be.instanceof(Object);
       done();
     });
   });
