@@ -58,9 +58,9 @@ process.on('uncaughtException', function(err) {
 
 describe("Tests", function() {
   it("should create a new user", function(done) {
-    connection.create_user('JS SDK Test', email, password, 'de', null, function(error, recovery_password) {
+    connection.create_user('JS SDK Test', email, password, 'de', null, function(error, result) {
       expect(error).to.be.null;
-      expect(recovery_password).to.be.instanceof(Object);
+      expect(result).to.be.null;
       done();
     });
   });
