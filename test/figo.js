@@ -107,14 +107,23 @@ describe("Tests", function() {
       expect(access.credentials).to.include(result.credentials);
       expect(access.save_credentials).to.be.equal(result.save_credentials);
       expect(access.consent).to.deep.include(result.consent);
+      account_id = access.id;
       done();
     });
   });
 
   it("should list all accesses", function(done) {
-    new figo.Session(access_token).get_accesses(function(error, accounts) {
+    new figo.Session(access_token).get_accesses(function(error, accesses) {
       expect(error).to.be.null;
-      expect(accounts).to.be.instanceof(Array);
+      expect(accesses).to.be.instanceof(Array);
+      done();
+    });
+  });
+
+  it("should get an access", function(done) {
+    new figo.Session(access_token).get_access(account_id, function(error, access) {
+      expect(error).to.be.null;
+      expect(access).to.be.instanceof(Object);
       done();
     });
   });
