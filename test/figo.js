@@ -147,6 +147,15 @@ describe("Tests", function() {
     });
   });
 
+  it("should get a list synchronization challenges", function(done) {
+    new figo.Session(access_token).get_synchronization_challenges(access_id, sync_id, function(error, challenges) {
+      expect(error).to.be.null;
+      expect(challenges).to.be.instanceof(Array);
+      expect(challenges[0]).to.have.keys('session', 'id', 'created_at', 'type', 'auth_methods');
+      done();
+    });
+  });
+
   it.skip("should add account", function(done) {
     new figo.Session(access_token).add_account("de", ["figo", "figo"], "90090042", null, null, function(error, token) {
       expect(error).to.be.null;
