@@ -83,7 +83,43 @@ describe("Tests", function() {
     });
   });
 
-  it("should add account", function(done) {
+  it("should add an access", function(done) {
+    var result = {
+      access_method_id: "5",
+      save_credentials: true,
+      account_identifier: [{ id: 'DE89370400440532013000', currency: 'EUR' }],
+      credentials : {
+        username : "11951500",
+        pin : "12345"
+      },
+      consent: {
+          recurring: true,
+          period: 90,
+          scopes: ["ACCOUNTS"]
+      }
+    }
+
+    new figo.Session(access_token).add_access(result.access_method_id, result.account_identifier[0], result.credentials, result.save_credentials, result.consent,  function(error, access) {
+      expect(error).to.be.null;
+      expect(access).to.be.instanceof(Object);
+      expect(access.id).to.be.a('string');
+      expect(access.access_method_id).to.be.equal(result.access_method_id);
+      expect(access.credentials).to.include(result.credentials);
+      expect(access.save_credentials).to.be.equal(result.save_credentials);
+      expect(access.consent).to.deep.include(result.consent);
+      done();
+    });
+  });
+
+  it("should list all accesses", function(done) {
+    new figo.Session(access_token).get_accesses(function(error, accounts) {
+      expect(error).to.be.null;
+      expect(accounts).to.be.instanceof(Array);
+      done();
+    });
+  });
+
+  it.skip("should add account", function(done) {
     new figo.Session(access_token).add_account("de", ["figo", "figo"], "90090042", null, null, function(error, token) {
       expect(error).to.be.null;
       expect(token).to.be.instanceof(Object);
