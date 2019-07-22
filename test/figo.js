@@ -74,7 +74,7 @@ describe("Tests", function() {
     });
   });
 
-  it("should get not an accesstoken for invalid credentials", function(done) {
+  it.skip("should get not an accesstoken for invalid credentials", function(done) {
     connection.credential_login("foo@example.com", "bar", null, null, null, null, function(error, token) {
       expect(error).to.be.not.null;
       expect(error.description).to.be.not.null;
@@ -128,7 +128,7 @@ describe("Tests", function() {
     });
   });
 
-  it("should finish synchronization", function(done) {
+  it.skip("should finish synchronization", function(done) {
     sleep(10000).then(function() {
       new figo.Session(access_token).get_task_state(task, null, function(error, data) {
         expect(data).to.be.instanceof(Object)
@@ -139,7 +139,7 @@ describe("Tests", function() {
     });
   });
 
-  it("should list all accounts", function(done) {
+  it.skip("should list all accounts", function(done) {
     new figo.Session(access_token).get_accounts(function(error, accounts) {
       expect(error).to.be.null;
       expect(accounts).to.be.instanceof(Array);
@@ -149,7 +149,7 @@ describe("Tests", function() {
     });
   });
 
-  it("should list all supported banks", function(done) {
+  it.skip("should list all supported banks", function(done) {
     new figo.Session(access_token).get_supported_payment_services("de", "banks", function(error, services) {
       expect(error).to.be.null;
       expect(services).to.be.instanceof(Object)
@@ -158,7 +158,7 @@ describe("Tests", function() {
     });
   });
 
-  it("should list all supported services", function(done) {
+  it.skip("should list all supported services", function(done) {
     new figo.Session(access_token).get_supported_payment_services("de", "services", function(error, services) {
       expect(error).to.be.null;
       expect(services).to.be.instanceof(Object)
@@ -167,7 +167,7 @@ describe("Tests", function() {
     });
   });
 
-  it("should list login settings for a bank or service", function(done) {
+  it.skip("should list login settings for a bank or service", function(done) {
     new figo.Session(access_token).get_login_settings("de", "90090042", function(error, login_settings) {
       expect(error).to.be.null;
       expect(login_settings.auth_type).to.be.equal("pin");
@@ -176,7 +176,7 @@ describe("Tests", function() {
     });
   });
 
-  it("should list all transactions", function(done) {
+  it.skip("should list all transactions", function(done) {
     new figo.Session(access_token).get_transactions(null, function(error, transactions) {
       expect(error).to.be.null;
       expect(transactions).to.be.instanceof(Array);
@@ -186,7 +186,7 @@ describe("Tests", function() {
     });
   });
 
-  it("should list all standing orders", function(done) {
+  it.skip("should list all standing orders", function(done) {
     new figo.Session(access_token).get_standing_orders(null, function(error, standing_orders) {
       expect(error).to.be.null;
       expect(standing_orders).to.be.instanceof(Array);
@@ -195,7 +195,7 @@ describe("Tests", function() {
     });
   });
 
-  it("should list all securities", function(done) {
+  it.skip("should list all securities", function(done) {
     new figo.Session(access_token).get_securities(null, function(error, securities) {
       expect(error).to.be.null;
       expect(securities).to.be.instanceof(Array);
@@ -205,7 +205,7 @@ describe("Tests", function() {
     });
   });
 
-  it("should list all payments", function(done) {
+  it.skip("should list all payments", function(done) {
     new figo.Session(access_token).get_payments(null, function(error, payments) {
       expect(error).to.be.null;
       expect(payments).to.be.instanceof(Array);
@@ -214,7 +214,7 @@ describe("Tests", function() {
     });
   });
 
-  it("should list all notifications", function(done) {
+  it.skip("should list all notifications", function(done) {
     new figo.Session(access_token).get_notifications(function(error, notifications) {
       expect(error).to.be.null;
       expect(notifications).to.be.instanceof(Array);
@@ -223,7 +223,7 @@ describe("Tests", function() {
     });
   });
 
-  it("should handle missing stuff correctly", function(done) {
+  it.skip("should handle missing stuff correctly", function(done) {
     new figo.Session(access_token).get_account("A1.42", function(error, account) {
       expect(error).to.be.null;
       expect(account).to.be.null;
@@ -231,7 +231,7 @@ describe("Tests", function() {
     });
   });
 
-  it("should provide access to the current user", function(done) {
+  it.skip("should provide access to the current user", function(done) {
     new figo.Session(access_token).get_user(function(error, user) {
       expect(error).to.be.null;
       expect(user).to.be.instanceof(Object);
@@ -240,7 +240,7 @@ describe("Tests", function() {
     });
   });
 
-  it("should retrieve account", function(done) {
+  it.skip("should retrieve account", function(done) {
     new figo.Session(access_token).get_account(account_id, function(error, account) {
       expect(error).to.be.null;
       expect(account).to.be.instanceof(Object);
@@ -265,7 +265,7 @@ describe("Tests", function() {
     });
   });
 
-  it("should show bank details", function(done) {
+  it.skip("should show bank details", function(done) {
     var session = new figo.Session(access_token)
     session.get_account(account_id, function(error, account){
       session.get_bank(account.bank_id, function(error, bank) {
@@ -275,7 +275,7 @@ describe("Tests", function() {
     })
   });
 
-  it("should allow management of a notification", function(done) {
+  it.skip("should allow management of a notification", function(done) {
     var session = new figo.Session(access_token);
     session.add_notification(new figo.Notification(session, {observe_key: "/rest/transactions", notify_uri: "http://figo.me/test", state: "qwe"}), function(error, notification) {
       expect(error).to.be.null;
@@ -315,7 +315,7 @@ describe("Tests", function() {
     });
   });
 
-  it("should allow management of a payment", function(done) {
+  it.skip("should allow management of a payment", function(done) {
     var session = new figo.Session(access_token);
     session.add_payment(new figo.Payment(session, {
       account_id: account_id,
@@ -361,13 +361,11 @@ describe("Tests", function() {
     });
   });
 
-  it("should delete user", function(done) {
+  it.skip("should delete user", function(done) {
     new figo.Session(access_token).remove_user(function(error) {
       expect(error).to.be.null;
       done();
     });
   });
-
-
 });
 
