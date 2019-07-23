@@ -44,6 +44,7 @@ var access_token = '';
 var task = '';
 var access_id = '';
 var sync_id = '';
+var challenge_id = '';
 
 
 const sleep = function(time) {
@@ -134,7 +135,7 @@ describe("Tests", function() {
       sync_id = sync.id
       expect(error).to.be.null;
       expect(sync).to.be.instanceof(Object);
-      expect(sync).to.have.keys('session', 'id', 'status', 'challenge', 'error', 'created_at', 'started_at', 'ended_at');
+      expect(sync).to.have.all.keys('session', 'id', 'status', 'challenge', 'error', 'created_at', 'started_at', 'ended_at');
       done();
     });
   });
@@ -149,9 +150,27 @@ describe("Tests", function() {
 
   it("should get a list synchronization challenges", function(done) {
     new figo.Session(access_token).get_synchronization_challenges(access_id, sync_id, function(error, challenges) {
+      challenge_id = challenges[0].id
       expect(error).to.be.null;
       expect(challenges).to.be.instanceof(Array);
-      expect(challenges[0]).to.have.keys('session', 'id', 'created_at', 'type', 'auth_methods');
+      expect(challenges[0]).to.have.all.keys('session', 'id', 'created_at', 'type', 'format', 'version', 'data', 'additional_info', 'label', 'input_format', 'max_length', 'min_length');
+      done();
+    });
+  });
+
+  it("should get a synchronization challenge", function(done) {
+    new figo.Session(access_token).get_synchronization_challenge(access_id, sync_id, challenge_id, function(error, challenge) {
+      expect(error).to.be.null;
+      expect(challenge).to.be.instanceof(Object);
+      expect(challenge).to.have.all.keys('session', 'id', 'created_at', 'type', 'format', 'version', 'data', 'additional_info', 'label', 'input_format', 'max_length', 'min_length');
+      done();
+    });
+  });
+
+  it("should solve a synchronization challenge", function(done) {
+    new figo.Session(access_token).solve_synchronization_challenge(access_id, sync_id, challenge_id, { value: '111111' }, function(error, result) {
+      expect(error).to.be.null;
+      expect(result).to.be.null;
       done();
     });
   });
