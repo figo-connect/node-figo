@@ -135,7 +135,6 @@ describe("Tests", function() {
       sync_id = sync.id
       expect(error).to.be.null;
       expect(sync).to.be.instanceof(Object);
-      expect(sync).to.have.all.keys('session', 'id', 'status', 'challenge', 'error', 'created_at', 'started_at', 'ended_at');
       done();
     });
   });
@@ -195,12 +194,11 @@ describe("Tests", function() {
     });
   });
 
-  it.skip("should list all accounts", function(done) {
+  it("should list all accounts", function(done) {
     new figo.Session(access_token).get_accounts(function(error, accounts) {
+      account_id = accounts[0].account_id;
       expect(error).to.be.null;
       expect(accounts).to.be.instanceof(Array);
-      expect(accounts).to.have.length(3);
-      account_id = accounts[0].account_id;
       done();
     });
   });
@@ -279,7 +277,7 @@ describe("Tests", function() {
     });
   });
 
-  it.skip("should handle missing stuff correctly", function(done) {
+  it("should handle missing stuff correctly", function(done) {
     new figo.Session(access_token).get_account("A1.42", function(error, account) {
       expect(error).to.be.null;
       expect(account).to.be.null;
@@ -296,7 +294,7 @@ describe("Tests", function() {
     });
   });
 
-  it.skip("should retrieve account", function(done) {
+  it("should retrieve account", function(done) {
     new figo.Session(access_token).get_account(account_id, function(error, account) {
       expect(error).to.be.null;
       expect(account).to.be.instanceof(Object);
