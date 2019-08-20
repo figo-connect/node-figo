@@ -60,9 +60,9 @@ process.on('uncaughtException', function(err) {
 
 describe("Tests", function() {
   it("should create a new user", function(done) {
-    connection.create_user('JS SDK Test', email, password, 'de', null, function(error, result) {
+    connection.create_user('JS SDK Test', email, password, 'de', function(error, result) {
       expect(error).to.be.null;
-      expect(result).to.be.null;
+      expect(result).to.be.instanceof(Object)
       done();
     });
   });
@@ -76,8 +76,8 @@ describe("Tests", function() {
     });
   });
 
-  it.skip("should get not an accesstoken for invalid credentials", function(done) {
-    connection.credential_login("foo@example.com", "bar", null, null, null, null, function(error, token) {
+  it("should not get an accesstoken with invalid credentials", function(done) {
+    connection.credential_login("foo@skifo.com", "bar", null, null, null, null, function(error, token) {
       expect(error).to.be.not.null;
       expect(error.description).to.be.not.null;
       expect(token).to.be.not.instanceof(Object);
@@ -85,31 +85,37 @@ describe("Tests", function() {
     });
   });
 
-  it("should add an access", function(done) {
-    var result = {
-      access_method_id: "5",
-      save_credentials: true,
-      account_identifier: [{ id: 'DE89370400440532013000', currency: 'EUR' }],
-      credentials : {
-        username : "11951500",
-        pin : "12345"
-      },
-      consent: {
-          recurring: true,
-          period: 90,
-          scopes: ["ACCOUNTS"]
-      }
-    }
-
-    new figo.Session(access_token).add_access(result.access_method_id, result.account_identifier[0], result.credentials, result.save_credentials, result.consent,  function(error, access) {
+  it("should get a user", function(done) {
+    new figo.Session(access_token).get_user(function(error, result) {
       expect(error).to.be.null;
+      expect(result).to.be.instanceof(Object);
+      expect(result.full_name).to.be.eq('JS SDK Test');
+      expect(result.email).to.be.eq(email);
+      expect(result.language).to.be.eq('de');
+      done();
+    });
+  });
+
+  it("should modify a user", function(done) {
+    new figo.Session(access_token).modify_user('Full name updated', null, null, null, null, function(error, result) {
+      expect(error).to.be.null;
+      expect(result).to.be.instanceof(Object);
+      expect(result.full_name).to.be.eq('Full name updated');
+      done();
+    });
+  });
+
+  it("should add an access", function(done) {
+    var access_method_id = "5370d1b9-3805-4335-9188-e5c5c5ddd9e0";
+    var credentials = { username : "11951500", pin : "12345" };
+    var consent = { recurring: true, period: 90, scopes: ["ACCOUNTS"] };
+
+    new figo.Session(access_token).add_access(access_method_id, credentials, consent, function(error, access) {
+      expect(error).to.be.null;
+      access_id = access.id;
       expect(access).to.be.instanceof(Object);
       expect(access.id).to.be.a('string');
-      expect(access.access_method_id).to.be.equal(result.access_method_id);
-      expect(access.credentials).to.include(result.credentials);
-      expect(access.save_credentials).to.be.equal(result.save_credentials);
-      expect(access.consent).to.deep.include(result.consent);
-      access_id = access.id;
+      expect(access.access_method_id).to.be.eql(access_method_id);
       done();
     });
   });
@@ -124,6 +130,14 @@ describe("Tests", function() {
 
   it("should get an access", function(done) {
     new figo.Session(access_token).get_access(access_id, function(error, access) {
+      expect(error).to.be.null;
+      expect(access).to.be.instanceof(Object);
+      done();
+    });
+  });
+
+  it.skip("should removes stored pin", function(done) {
+    new figo.Session(access_token).remove_pin(access_id, function(error, access) {
       expect(error).to.be.null;
       expect(access).to.be.instanceof(Object);
       done();
@@ -147,7 +161,7 @@ describe("Tests", function() {
     });
   });
 
-  it("should get a list synchronization challenges", function(done) {
+  it.skip("should get a list synchronization challenges", function(done) {
     new figo.Session(access_token).get_synchronization_challenges(access_id, sync_id, function(error, challenges) {
       challenge_id = challenges[0].id
       expect(error).to.be.null;
@@ -157,7 +171,7 @@ describe("Tests", function() {
     });
   });
 
-  it("should get a synchronization challenge", function(done) {
+  it.skip("should get a synchronization challenge", function(done) {
     new figo.Session(access_token).get_synchronization_challenge(access_id, sync_id, challenge_id, function(error, challenge) {
       expect(error).to.be.null;
       expect(challenge).to.be.instanceof(Object);
@@ -166,19 +180,10 @@ describe("Tests", function() {
     });
   });
 
-  it("should solve a synchronization challenge", function(done) {
+  it.skip("should solve a synchronization challenge", function(done) {
     new figo.Session(access_token).solve_synchronization_challenge(access_id, sync_id, challenge_id, { value: '111111' }, function(error, result) {
       expect(error).to.be.null;
       expect(result).to.be.null;
-      done();
-    });
-  });
-
-  it.skip("should add account", function(done) {
-    new figo.Session(access_token).add_account("de", ["figo", "figo"], "90090042", null, null, function(error, token) {
-      expect(error).to.be.null;
-      expect(token).to.be.instanceof(Object);
-      task = token;
       done();
     });
   });
@@ -194,7 +199,7 @@ describe("Tests", function() {
     });
   });
 
-  it("should list all accounts", function(done) {
+  it.skip("should list all accounts", function(done) {
     new figo.Session(access_token).get_accounts(function(error, accounts) {
       account_id = accounts[0].account_id;
       expect(error).to.be.null;
@@ -204,7 +209,7 @@ describe("Tests", function() {
   });
 
   it.skip("should list all supported banks", function(done) {
-    new figo.Session(access_token).get_supported_payment_services("de", "banks", function(error, services) {
+    new figo.Session(access_token).get_finacial_providers("de", "banks", function(error, services) {
       expect(error).to.be.null;
       expect(services).to.be.instanceof(Object)
       expect(services.banks.length).to.be.above(0);
@@ -213,7 +218,7 @@ describe("Tests", function() {
   });
 
   it.skip("should list all supported services", function(done) {
-    new figo.Session(access_token).get_supported_payment_services("de", "services", function(error, services) {
+    new figo.Session(access_token).get_finacial_providers("de", "services", function(error, services) {
       expect(error).to.be.null;
       expect(services).to.be.instanceof(Object)
       expect(services.services.length).to.be.above(0);
@@ -240,11 +245,10 @@ describe("Tests", function() {
     });
   });
 
-  it.skip("should list all standing orders", function(done) {
-    new figo.Session(access_token).get_standing_orders(null, function(error, standing_orders) {
+  it("should list all standing orders", function(done) {
+    new figo.Session(access_token).get_standing_orders(null, true, null, function(error, standing_orders) {
       expect(error).to.be.null;
       expect(standing_orders).to.be.instanceof(Array);
-      expect(standing_orders.length).to.be.above(-1);
       done();
     });
   });
@@ -277,7 +281,7 @@ describe("Tests", function() {
     });
   });
 
-  it("should handle missing stuff correctly", function(done) {
+  it.skip("should handle missing stuff correctly", function(done) {
     new figo.Session(access_token).get_account("A1.42", function(error, account) {
       expect(error).to.be.null;
       expect(account).to.be.null;
@@ -294,7 +298,7 @@ describe("Tests", function() {
     });
   });
 
-  it("should retrieve account", function(done) {
+  it.skip("should retrieve account", function(done) {
     new figo.Session(access_token).get_account(account_id, function(error, account) {
       expect(error).to.be.null;
       expect(account).to.be.instanceof(Object);
@@ -415,7 +419,7 @@ describe("Tests", function() {
     });
   });
 
-  it.skip("should delete user", function(done) {
+  it("should remove a user", function(done) {
     new figo.Session(access_token).remove_user(function(error) {
       expect(error).to.be.null;
       done();
