@@ -46,7 +46,6 @@ var access_id = '';
 var sync_id = '';
 var challenge_id = '';
 
-
 const sleep = function(time) {
   return new Promise((resolve) => setTimeout(resolve, time));
 }
@@ -72,6 +71,15 @@ describe("Tests", function() {
       expect(error).to.be.null;
       expect(token).to.be.instanceof(Object);
       access_token = token.access_token;
+      done();
+    });
+  });
+
+  it("should get an accesstoken - for payments", function(done) {
+    connection.credential_login(email, password, null, null, null, "payments=ro", function(error, token) {
+      expect(error).to.be.null;
+      expect(token).to.be.instanceof(Object);
+      payment_access_token = token.access_token;
       done();
     });
   });
@@ -263,8 +271,8 @@ describe("Tests", function() {
     });
   });
 
-  it.skip("should list all payments", function(done) {
-    new figo.Session(access_token).get_payments(null, function(error, payments) {
+  it("should list all payments", function(done) {
+    new figo.Session(payment_access_token).get_payments(null, null, function(error, payments) {
       expect(error).to.be.null;
       expect(payments).to.be.instanceof(Array);
       expect(payments.length).to.be.above(-1);
