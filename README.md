@@ -91,7 +91,7 @@ Log in to obtain such access token:
 ```javascript
 var access_token = '';
 
-connection.credential_login(username, password, null, null, null, null, function(error, token) {
+connection.credential_login(email, password, null, null, null, null, function(error, token) {
   if (error) {
     console.error(error);
   } else {
